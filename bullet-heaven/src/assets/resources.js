@@ -10,6 +10,7 @@ export let GAME_RESOURCES = [
     { name: "player", type: "image", src: "src/assets/player.png" },
     { name: "zombie-axe-idle", type: "image", src: "src/assets/zombie-axe/idle.png" },
     { name: "zombie-axe-walking", type: "image", src: "src/assets/zombie-axe/walking.png" },
+    { name: "zombie-axe-death", type: "image", src: "src/assets/zombie-axe/death.png" },
 
     /* Maps.
      * @example

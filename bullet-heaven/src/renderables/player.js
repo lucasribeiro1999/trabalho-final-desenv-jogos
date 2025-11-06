@@ -12,7 +12,7 @@ class PlayerEntity extends me.Sprite {
 
         super(
             me.game.viewport.width / 2 - image.width / 2,
-            me.game.viewport.height - image.height - 20,
+            me.game.viewport.height / 2 - image.height / 2,
             {
                 image,
                 framewidth: 13,
@@ -39,6 +39,10 @@ class PlayerEntity extends me.Sprite {
     update(dt) {
         super.update(dt);
 
+        // remember previous position to resolve collisions cleanly
+        const prevX = this.pos.x;
+        const prevY = this.pos.y;
+
         if (me.input.isKeyPressed("left")) {
             this.pos.x -= this.velx * dt / 1000;
         }
@@ -61,7 +65,22 @@ class PlayerEntity extends me.Sprite {
 
         this.pos.x = me.Math.clamp(this.pos.x, 32, this.maxX);
 
+        // store last valid position for collision handler
+        this._lastValidX = prevX;
+        this._lastValidY = prevY;
+
         return true;
+    }
+
+    onCollision(response, other) {
+        if (other.body && other.body.collisionType === me.collision.types.ENEMY_OBJECT) {
+            // revert to last valid position to block movement through the enemy
+            if (typeof this._lastValidX === 'number' && typeof this._lastValidY === 'number') {
+                this.pos.x = this._lastValidX;
+                this.pos.y = this._lastValidY;
+            }
+            return false; // prevent default physics response (no push/knockback)
+        }
     }
 };
 
