@@ -3,7 +3,7 @@ import * as me from 'melonjs';
 class EnemyEntity extends me.Sprite {
     constructor(x, y) {
         super(x, y, {
-            image: "zombie-axe",
+            image: "zombie-axe-idle",
             framewidth: 13,
             frameheight: 18,
         });
@@ -15,8 +15,10 @@ class EnemyEntity extends me.Sprite {
         this.body.ignoreGravity = true;
 
         // randomize and set animation
-        this.addAnimation("idle", [me.Math.random(0, 4)], 1);
+        this.addAnimation("idle", [0, 1, 2, 3], 350);
         this.setCurrentAnimation("idle");
+
+        this.scale(3)
     }
 
     /**

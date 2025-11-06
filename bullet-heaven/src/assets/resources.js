@@ -8,7 +8,8 @@ export let GAME_RESOURCES = [
     // { name: "background", type: "image", src: "data/img/background.png" },
     { name: "bullet", type: "image", src: "src/assets/bullet.png" },
     { name: "player", type: "image", src: "src/assets/player.png" },
-    { name: "zombie-axe", type: "image", src: "src/assets/zombie-axe.png" },
+    { name: "zombie-axe-idle", type: "image", src: "src/assets/zombie-axe/idle.png" },
+    { name: "zombie-axe-walking", type: "image", src: "src/assets/zombie-axe/walking.png" },
 
     /* Maps.
      * @example

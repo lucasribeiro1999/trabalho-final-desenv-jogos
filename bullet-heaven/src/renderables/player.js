@@ -20,9 +20,17 @@ class PlayerEntity extends me.Sprite {
             }
         );
 
+        this.body = new me.Body(this);
+        this.body.addShape(new me.Rect(0, 0, this.width, this.height));
+        this.body.collisionType = me.collision.types.PLAYER_OBJECT;
+        this.body.ignoreGravity = true;
+
+
         this.vely = 450;
         this.velx = 450;
         this.maxX = me.game.viewport.width - this.width;
+
+        this.scale(3)
     }
 
     /**
