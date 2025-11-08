@@ -1,7 +1,6 @@
 import * as me from 'melonjs';
 
 import EnemyEntity from './../renderables/enemy.js';
-import PlayScreen from "../stages/play.js";
 
 class EnemyManager extends me.Container {
     static COLS = 9;
@@ -19,10 +18,6 @@ class EnemyManager extends me.Container {
         }
     }
 
-
-    /**
-     *
-     */
     createEnemies() {
         const initialCount = 10;
         for (let i = 0; i < initialCount; i++) {
@@ -35,14 +30,13 @@ class EnemyManager extends me.Container {
         this.createdEnemies = true;
     }
 
-
     onActivateEvent() {
         this.timer = me.timer.setInterval(() => {
             const x = Math.random() * (me.game.viewport.width - 32) + 16;
             const y = Math.random() * (me.game.viewport.height - 32) + 16;
             const enemy = new EnemyEntity(x, y);
             this.addChild(enemy);
-        }, 2000);
+        }, 4000);
     }
 
     onDeactivateEvent() {
