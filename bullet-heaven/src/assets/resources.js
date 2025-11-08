@@ -4,20 +4,26 @@ export let GAME_RESOURCES = [
      * @example
      * { name: "example", type:"image", src: "data/img/example.png" },
      */
-    // { name: "tileset", type: "image", src: "data/img/tileset.png" },
-    // { name: "background", type: "image", src: "data/img/background.png" },
     { name: "bullet", type: "image", src: "src/assets/bullet.png" },
-    { name: "player", type: "image", src: "src/assets/player.png" },
+    { name: "player", type: "json", src: "src/assets/player/player.json" },
+    { name: "player", type: "image", src: "src/assets/player/player.png" },
     { name: "zombie-axe-idle", type: "image", src: "src/assets/zombie-axe/idle.png" },
     { name: "zombie-axe-walking", type: "image", src: "src/assets/zombie-axe/walking.png" },
     { name: "zombie-axe-death", type: "image", src: "src/assets/zombie-axe/death.png" },
+    { name: "fire-up", type: "image", src: "src/assets/shoots/fire/up.png" },
+    { name: "fire-down", type: "image", src: "src/assets/shoots/fire/down.png" },
+    { name: "fire-left", type: "image", src: "src/assets/shoots/fire/left.png" },
+    { name: "fire-right", type: "image", src: "src/assets/shoots/fire/right.png" },
+    { name: "map-01", type: "image", src: "src/assets/zombie-apocalypse.png" },
+    { name: "filled-heart", type: "image", src: "src/assets/health/filled-heart.png" },
+    { name: "empty-heart", type: "image", src: "src/assets/health/empty-heart.png" },
 
     /* Maps.
      * @example
      * { name: "example01", type: "tmx", src: "data/map/example01.tmx" },
      * { name: "example01", type: "tmx", src: "data/map/example01.json" },
      */
-    // { name: "map1", type: "tmx", src: "./zombie-apocalypse.tmx" },
+    // { name: "map-01", type: "tmx", src: "src/assets/zombie-apocalypse.json" },
 
 
     /* Tilesets.
@@ -25,7 +31,7 @@ export let GAME_RESOURCES = [
      * { name: "example01", type: "tsx", src: "data/map/example01.tsx" },
      * { name: "example01", type: "tsx", src: "data/map/example01.json" },
      */
-    // { name: "tileset", type: "tsx", src: "./green-urban-tileset.tsx" },
+    // { name: "tileset", type: "tsx", src: "src/assets/green-urban-tileset.json" },
 
 
     /* Background music.
