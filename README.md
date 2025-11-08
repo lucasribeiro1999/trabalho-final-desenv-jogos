@@ -1,5 +1,10 @@
 # Zombie Apocalypse
 
+## Assets Usados
+
+https://hochupitsu.itch.io/heart-and-mana
+https://thelazystone.itch.io/post-apocalypse-pixel-art-asset-pack
+
 ## Etapas
 
 - [ ] Criar o mapa no Tiled
@@ -15,7 +20,6 @@
 - [ ] Os zumbis tem chance de dropar uma arma com níveis de raridade
 - [ ] Armas iguais e de mesmo nível podem ser usadas pra craftar a mesma arma um nível acima
 - [ ] A cada horda abre uma loja com itens aleatórios que o personagem pode comprar para se equipar
-
 
 ## Planos Futuros
 
