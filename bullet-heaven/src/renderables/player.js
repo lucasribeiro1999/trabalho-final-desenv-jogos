@@ -1,7 +1,5 @@
 import * as me from 'melonjs';
-
 import FireProjectile from './fireProjectile.js';
-
 import CONSTANTS from '../constants.js';
 
 class PlayerEntity extends me.Entity {
@@ -31,7 +29,13 @@ class PlayerEntity extends me.Entity {
 
         this.vely = 450;
         this.velx = 450;
-        this.maxX = me.game.viewport.width - this.width;
+
+        // Margem para não colar nas bordas (ajuste se quiser)
+        this.margin = 32;
+        this.minX = this.margin;
+        this.maxX = me.game.viewport.width - this.width - this.margin;
+        this.minY = this.margin;
+        this.maxY = me.game.viewport.height - this.height - this.margin;
 
         this.facing = 'up';
         this.lastShotAt = me.timer.getTime() - CONSTANTS.FIRE.RATE_MS;
@@ -42,8 +46,6 @@ class PlayerEntity extends me.Entity {
     }
 
     setupAnimations() {
-        // this.body.setStatic();
-
         const animations = me.loader.getJSON("player").animations;
 
         const idleFrames = animations["idle/idle"];
@@ -76,10 +78,8 @@ class PlayerEntity extends me.Entity {
 
     switchToDirection(direction) {
         if (this.lastFacing === direction) return;
-
         this.lastFacing = direction;
-
-        this.renderable.setCurrentAnimation(`running-${direction}`)
+        this.renderable.setCurrentAnimation(`running-${direction}`);
     }
 
     switchToIdle() {
@@ -89,6 +89,7 @@ class PlayerEntity extends me.Entity {
     update(dt) {
         super.update(dt);
 
+        // GUARDA POSIÇÃO ANTERIOR (vai ser o "último ponto seguro")
         const prevX = this.pos.x;
         const prevY = this.pos.y;
 
@@ -126,29 +127,34 @@ class PlayerEntity extends me.Entity {
             this.switchToIdle();
         }
 
+        // Disparo automático respeitando a direção/facing
         {
             const now = me.timer.getTime();
             const rate = (typeof FireProjectile.RATE_MS === 'number') ? FireProjectile.RATE_MS : 2000;
             if (now - this.lastShotAt >= rate) {
-                const centerX = this.getBounds().x + this.width / 2;
-                const centerY = this.getBounds().y + this.height / 2;
+                const b = this.getBounds();
+                const centerX = b.x + this.width / 2;
+                const centerY = b.y + this.height / 2;
 
                 let spawnX = centerX;
                 let spawnY = centerY;
 
                 const offset = 8;
-                if (this.facing === 'up') spawnY = this.getBounds().top - offset;
-                if (this.facing === 'down') spawnY = this.getBounds().top + this.height + offset;
-                if (this.facing === 'left') spawnX = this.getBounds().left - offset;
-                if (this.facing === 'right') spawnX = this.getBounds().left + this.width + offset;
+                if (this.facing === 'up')    spawnY = b.top - offset;
+                if (this.facing === 'down')  spawnY = b.top + this.height + offset;
+                if (this.facing === 'left')  spawnX = b.left - offset;
+                if (this.facing === 'right') spawnX = b.left + this.width + offset;
 
                 me.game.world.addChild(new FireProjectile(spawnX, spawnY, this.facing), 3);
                 this.lastShotAt = now;
             }
         }
 
-        this.pos.x = me.Math.clamp(this.pos.x, 32, this.maxX);
+        // Clamps horizontal e vertical
+        this.pos.x = me.Math.clamp(this.pos.x, this.minX, this.maxX);
+        this.pos.y = me.Math.clamp(this.pos.y, this.minY, this.maxY);
 
+        // Salva o ÚLTIMO PONTO SEGURO = posição ANTES do movimento deste frame
         this._lastValidX = prevX;
         this._lastValidY = prevY;
 
@@ -156,14 +162,25 @@ class PlayerEntity extends me.Entity {
     }
 
     onCollision(response, other) {
-        if (other.body && other.body.collisionType === me.collision.types.ENEMY_OBJECT) {
+        if (!(other?.body)) return false;
+
+        // zumbi/inimigo "agarra": voltar ao último ponto seguro
+        if (other.body.collisionType === me.collision.types.ENEMY_OBJECT) {
             if (typeof this._lastValidX === 'number' && typeof this._lastValidY === 'number') {
                 this.pos.x = this._lastValidX;
                 this.pos.y = this._lastValidY;
+
+                // evita continuar empurrando no mesmo frame
+                if (this.body && this.body.vel) {
+                    this.body.vel.x = 0;
+                    this.body.vel.y = 0;
+                }
             }
             return false;
         }
+
+        return false;
     }
-};
+}
 
 export default PlayerEntity;
