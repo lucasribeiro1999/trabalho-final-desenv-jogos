@@ -4,12 +4,31 @@ import PlayerEntity from "../renderables/player.js";
 import EnemyManager from "../managers/enemy-manager.js";
 
 class PlayScreen extends me.Stage {
-    /**
-     *  action to perform on state change
-     */
     onResetEvent() {
+        me.game.world.backgroundColor.parseCSS("#707B64");
 
-        me.game.world.backgroundColor.parseCSS("#000000");
+        const bgImage = me.loader.getImage("map-01");
+        if (bgImage) {
+            const bg = new me.Renderable(0, 0, me.game.viewport.width, me.game.viewport.height);
+            bg.draw = function (renderer) {
+                if (bgImage.width > 0 && bgImage.height > 0) {
+                    const scaleX = me.game.viewport.width / bgImage.width;
+                    const scaleY = me.game.viewport.height / bgImage.height;
+                    const scale = Math.min(scaleX, scaleY);
+                    const scaledWidth = bgImage.width * scale;
+                    const scaledHeight = bgImage.height * scale;
+                    const offsetX = (me.game.viewport.width) / 2;
+                    const offsetY = (me.game.viewport.height) / 2;
+                    renderer.drawImage(bgImage, offsetX, offsetY, scaledWidth, scaledHeight);
+                }
+            };
+            me.game.world.addChild(bg, 0);
+        }
+
+        me.game.playerAtlas = new me.TextureAtlas(
+            me.loader.getJSON("player"),
+            me.loader.getImage("player")
+        );
 
         this.player = new PlayerEntity();
         me.game.world.addChild(this.player, 1);
@@ -18,13 +37,14 @@ class PlayScreen extends me.Stage {
         this.enemyManager.createEnemies();
         me.game.world.addChild(this.enemyManager, 2);
 
-
         me.input.bindKey(me.input.KEY.LEFT, "left");
-        me.input.bindKey(me.input.KEY.RIGHT, "right");
         me.input.bindKey(me.input.KEY.A, "left");
+        me.input.bindKey(me.input.KEY.RIGHT, "right");
         me.input.bindKey(me.input.KEY.D, "right");
-
-        me.input.bindKey(me.input.KEY.SPACE, "shoot", true);
+        me.input.bindKey(me.input.KEY.UP, "up");
+        me.input.bindKey(me.input.KEY.W, "up");
+        me.input.bindKey(me.input.KEY.DOWN, "down");
+        me.input.bindKey(me.input.KEY.S, "down");
     }
 
 

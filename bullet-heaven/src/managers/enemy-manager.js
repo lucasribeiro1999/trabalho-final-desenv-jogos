@@ -1,17 +1,15 @@
 import * as me from 'melonjs';
 
 import EnemyEntity from './../renderables/enemy.js';
-import PlayScreen from "../stages/play.js";
 
 class EnemyManager extends me.Container {
     static COLS = 9;
     static ROWS = 4;
 
     constructor() {
-        super(32, 32, EnemyManager.COLS * 64 - 32, EnemyManager.ROWS * 64 - 32);
+        super(0, 0, me.game.viewport.width, me.game.viewport.height);
 
         this.enableChildBoundsUpdate = true;
-        this.vel = 16;
 
         this.onChildChange = () => {
             if (this.children.length === 0) {
@@ -20,49 +18,25 @@ class EnemyManager extends me.Container {
         }
     }
 
-
-    /**
-     *
-     */
     createEnemies() {
-        for (let i = 0; i < EnemyManager.COLS; i++) {
-            for (let j = 0; j < EnemyManager.ROWS; j++) {
-                var enemy = new EnemyEntity(i * 64, j * 64);
-                this.addChild(enemy);
-            }
+        const initialCount = 10;
+        for (let i = 0; i < initialCount; i++) {
+            const x = Math.random() * (me.game.viewport.width - 32) + 16;
+            const y = Math.random() * (me.game.viewport.height - 32) + 16;
+            const enemy = new EnemyEntity(x, y);
+            this.addChild(enemy);
         }
 
         this.createdEnemies = true;
     }
 
-
     onActivateEvent() {
         this.timer = me.timer.setInterval(() => {
-
-            let bounds = this.getBounds();
-
-            if ((this.vel > 0 && (bounds.right + this.vel) >= me.game.viewport.width) ||
-                (this.vel < 0 && (bounds.left + this.vel) <= 0)) {
-
-                this.vel *= -1;
-                this.pos.y += 16;
-
-                if (this.vel > 0) {
-                    this.vel += 5;
-                }
-                else {
-                    this.vel -= 5;
-                }
-
-                // again, I wish I could do me.state.get(me.state.PLAY).checkIfLoss()
-                // this is bugging out on bounds.bottom, because bounds.bottom === Infinity when it is moving down?
-                if (me.state.current() instanceof PlayScreen)
-                    me.state.current().checkIfLoss(bounds.bottom); // <<<
-            }
-            else {
-                this.pos.x += this.vel;
-            }
-        }, 250);
+            const x = Math.random() * (me.game.viewport.width - 32) + 16;
+            const y = Math.random() * (me.game.viewport.height - 32) + 16;
+            const enemy = new EnemyEntity(x, y);
+            this.addChild(enemy);
+        }, 4000);
     }
 
     onDeactivateEvent() {
