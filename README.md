@@ -4,10 +4,10 @@
 
 - [ ] Criar o mapa no Tiled
 - [ ] Adicionar sprites e animações dos personagens/inimigos/tiros
-- [ ] Fazer o personagem mover em todas as direções (falta cima, baixo e diagonais)
-- [ ] Fazer os zumbis spawnarem aleatoriamente num circulo em volta do personagem
-- [ ] Fazer os zumbis sempre andarem em direção ao personagem
-- [ ] Adicionar colisão dos zumbis com o personagem
+- [X] Fazer o personagem mover em todas as direções (falta cima, baixo e diagonais)
+- [X] Fazer os zumbis spawnarem aleatoriamente num circulo em volta do personagem
+- [X] Fazer os zumbis sempre andarem em direção ao personagem
+- [X] Adicionar colisão dos zumbis com o personagem
 - [ ] Adicionar colisão dos tiros com os zumbis
 - [ ] Fazer os zumbis droparem moedas ao morrerem
 - [ ] Fazer o tiro padrão ser atirado na direção que o personagem anda
@@ -22,3 +22,4 @@
 - [ ] Adicionar munição nas armas e loot boxes no chão pro personagem reabastecer
 - [ ] Adicionar níveis de dificuldade que alteram parametros do jogo, como taxa de drop de munição
 - [ ] Spawnar "magias" em volta do personagem que dá dano na área do sprite da animação
+- [ ] Adicionar HP no personagem e nos inimigos
