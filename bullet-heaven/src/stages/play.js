@@ -1,15 +1,26 @@
-import * as me from 'melonjs';
+// src/stages/play.js
+import * as me from "melonjs";
 
 import PlayerEntity from "../renderables/player.js";
 import EnemyManager from "../managers/enemy-manager.js";
+import XPHUD from "../renderables/xpHud.js";
+import { GameData } from "../gameData.js";
 
 class PlayScreen extends me.Stage {
     onResetEvent() {
+        // sempre que começar/der reset na fase, zera o XP
+        GameData.xp = 0;
+
         me.game.world.backgroundColor.parseCSS("#707B64");
 
         const bgImage = me.loader.getImage("map-01");
         if (bgImage) {
-            const bg = new me.Renderable(0, 0, me.game.viewport.width, me.game.viewport.height);
+            const bg = new me.Renderable(
+                0,
+                0,
+                me.game.viewport.width,
+                me.game.viewport.height
+            );
             bg.draw = function (renderer) {
                 if (bgImage.width > 0 && bgImage.height > 0) {
                     const scaleX = me.game.viewport.width / bgImage.width;
@@ -17,9 +28,15 @@ class PlayScreen extends me.Stage {
                     const scale = Math.min(scaleX, scaleY);
                     const scaledWidth = bgImage.width * scale;
                     const scaledHeight = bgImage.height * scale;
-                    const offsetX = (me.game.viewport.width) / 2;
-                    const offsetY = (me.game.viewport.height) / 2;
-                    renderer.drawImage(bgImage, offsetX, offsetY, scaledWidth, scaledHeight);
+                    const offsetX = me.game.viewport.width / 2;
+                    const offsetY = me.game.viewport.height / 2;
+                    renderer.drawImage(
+                        bgImage,
+                        offsetX,
+                        offsetY,
+                        scaledWidth,
+                        scaledHeight
+                    );
                 }
             };
             me.game.world.addChild(bg, 0);
@@ -37,6 +54,10 @@ class PlayScreen extends me.Stage {
         this.enemyManager.createEnemies();
         me.game.world.addChild(this.enemyManager, 2);
 
+        // HUD de XP no topo (z-index alto)
+        this.xpHud = new XPHUD();
+        me.game.world.addChild(this.xpHud, 9999);
+
         me.input.bindKey(me.input.KEY.LEFT, "left");
         me.input.bindKey(me.input.KEY.A, "left");
         me.input.bindKey(me.input.KEY.RIGHT, "right");
@@ -47,7 +68,6 @@ class PlayScreen extends me.Stage {
         me.input.bindKey(me.input.KEY.S, "down");
     }
 
-
     onDestroyEvent() {
         me.input.unbindKey(me.input.KEY.LEFT);
         me.input.unbindKey(me.input.KEY.RIGHT);
@@ -57,12 +77,11 @@ class PlayScreen extends me.Stage {
         me.input.unbindKey(me.input.KEY.SPACE);
     }
 
-
     checkIfLoss(y) {
         if (y >= this.player.pos.y) {
             this.reset();
         }
     }
-};
+}
 
 export default PlayScreen;

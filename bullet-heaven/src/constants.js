@@ -1,3 +1,4 @@
+// src/constants.js
 const defines = {
     LASER: {
         WIDTH: 5,
@@ -8,6 +9,9 @@ const defines = {
     },
     SPRITE: {
         SCALE_UP: 2
+    },
+    XP: {
+        PER_ZOMBIE: 10 // quanto de XP ganha por zumbi morto
     }
 };
 
