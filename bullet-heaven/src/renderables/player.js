@@ -1,6 +1,6 @@
 import * as me from 'melonjs';
-import FireProjectile from './fireProjectile.js';
 import CONSTANTS from '../constants.js';
+import WeaponEntity from './weapon.js';
 
 class PlayerEntity extends me.Entity {
     constructor() {
@@ -12,16 +12,11 @@ class PlayerEntity extends me.Entity {
                 height: 16 * CONSTANTS.SPRITE.SCALE_UP,
             }
         );
-
         this.anchorPoint.set(0.5, 0.5);
-
         this.body = new me.Body(this);
         this.body.addShape(
             new me.Rect(
-                -this.width / 2,
-                -this.height / 2,
-                this.width,
-                this.height
+                -this.width / 2, -this.height / 2, this.width, this.height
             )
         );
         this.body.collisionType = me.collision.types.PLAYER_OBJECT;
@@ -29,8 +24,6 @@ class PlayerEntity extends me.Entity {
 
         this.vely = 450;
         this.velx = 450;
-
-        // Margem para não colar nas bordas (ajuste se quiser)
         this.margin = 32;
         this.minX = this.margin;
         this.maxX = me.game.viewport.width - this.width - this.margin;
@@ -38,16 +31,43 @@ class PlayerEntity extends me.Entity {
         this.maxY = me.game.viewport.height - this.height - this.margin;
 
         this.facing = 'up';
-        this.lastShotAt = me.timer.getTime() - CONSTANTS.FIRE.RATE_MS;
         this.isMoving = false;
         this.lastFacing = 'up';
 
         this.setupAnimations();
+
+        // Três slots de armas
+        this.weapons = [
+            new WeaponEntity(this, "pistola"),
+            new WeaponEntity(this, "fuzil de assalto"),
+            new WeaponEntity(this, "shotgun")
+        ];
+        this.currentWeaponSlot = 0;
+        me.game.world.addChild(this.weapons[0], 3);
     }
 
-    setupAnimations() {
-        const animations = me.loader.getJSON("player").animations;
+    switchWeapon(slot) {
+    if (
+        slot >= 0 &&
+        slot < this.weapons.length &&
+        slot !== this.currentWeaponSlot
+    ) {
+        // Remove arma atual, se houver
+        if (this.weapons[this.currentWeaponSlot]) {
+            me.game.world.removeChild(this.weapons[this.currentWeaponSlot]);
+        }
+        this.currentWeaponSlot = slot;
+        // Adiciona arma nova, se houver
+        if (this.weapons[slot]) {
+            me.game.world.addChild(this.weapons[slot], 3);
+        }
+    }
+}
 
+
+    setupAnimations() {
+        // Ajuste conforme seus assets JSON e atlas
+        const animations = me.loader.getJSON("player").animations;
         const idleFrames = animations["idle/idle"];
         const deathFrames = animations["death/death"];
         const runningDownFrames = animations["running/down/down"];
@@ -63,7 +83,6 @@ class PlayerEntity extends me.Entity {
             ...runningRigthFrames,
             ...runningUpFrames
         ]);
-
         this.renderable.scale(CONSTANTS.SPRITE.SCALE_UP, CONSTANTS.SPRITE.SCALE_UP);
 
         this.renderable.addAnimation("idle", idleFrames, 125);
@@ -89,10 +108,8 @@ class PlayerEntity extends me.Entity {
     update(dt) {
         super.update(dt);
 
-        // GUARDA POSIÇÃO ANTERIOR (vai ser o "último ponto seguro")
         const prevX = this.pos.x;
         const prevY = this.pos.y;
-
         this.isMoving = false;
 
         if (me.input.isKeyPressed("left")) {
@@ -101,60 +118,35 @@ class PlayerEntity extends me.Entity {
             this.isMoving = true;
             this.switchToDirection('left');
         }
-
         if (me.input.isKeyPressed("right")) {
             this.pos.x += this.velx * dt / 1000;
             this.facing = 'right';
             this.isMoving = true;
             this.switchToDirection('right');
         }
-
         if (me.input.isKeyPressed("up")) {
             this.pos.y -= this.vely * dt / 1000;
             this.facing = 'up';
             this.isMoving = true;
             this.switchToDirection('up');
         }
-
         if (me.input.isKeyPressed("down")) {
             this.pos.y += this.vely * dt / 1000;
             this.facing = 'down';
             this.isMoving = true;
             this.switchToDirection('down');
         }
-
         if (!this.isMoving) {
             this.switchToIdle();
         }
 
-        // Disparo automático respeitando a direção/facing
-        {
-            const now = me.timer.getTime();
-            const rate = (typeof FireProjectile.RATE_MS === 'number') ? FireProjectile.RATE_MS : 2000;
-            if (now - this.lastShotAt >= rate) {
-                const b = this.getBounds();
-                const centerX = b.x + this.width / 2;
-                const centerY = b.y + this.height / 2;
+        // Troca de arma: teclas 1, 2, 3
+        if (me.input.isKeyPressed("one")) this.switchWeapon(0);
+        if (me.input.isKeyPressed("two")) this.switchWeapon(1);
+        if (me.input.isKeyPressed("three")) this.switchWeapon(2);
 
-                let spawnX = centerX;
-                let spawnY = centerY;
-
-                const offset = 8;
-                if (this.facing === 'up')    spawnY = b.top - offset;
-                if (this.facing === 'down')  spawnY = b.top + this.height + offset;
-                if (this.facing === 'left')  spawnX = b.left - offset;
-                if (this.facing === 'right') spawnX = b.left + this.width + offset;
-
-                me.game.world.addChild(new FireProjectile(spawnX, spawnY, this.facing), 3);
-                this.lastShotAt = now;
-            }
-        }
-
-        // Clamps horizontal e vertical
         this.pos.x = me.Math.clamp(this.pos.x, this.minX, this.maxX);
         this.pos.y = me.Math.clamp(this.pos.y, this.minY, this.maxY);
-
-        // Salva o ÚLTIMO PONTO SEGURO = posição ANTES do movimento deste frame
         this._lastValidX = prevX;
         this._lastValidY = prevY;
 
@@ -163,14 +155,10 @@ class PlayerEntity extends me.Entity {
 
     onCollision(response, other) {
         if (!(other?.body)) return false;
-
-        // zumbi/inimigo "agarra": voltar ao último ponto seguro
         if (other.body.collisionType === me.collision.types.ENEMY_OBJECT) {
             if (typeof this._lastValidX === 'number' && typeof this._lastValidY === 'number') {
                 this.pos.x = this._lastValidX;
                 this.pos.y = this._lastValidY;
-
-                // evita continuar empurrando no mesmo frame
                 if (this.body && this.body.vel) {
                     this.body.vel.x = 0;
                     this.body.vel.y = 0;
@@ -178,7 +166,6 @@ class PlayerEntity extends me.Entity {
             }
             return false;
         }
-
         return false;
     }
 }
