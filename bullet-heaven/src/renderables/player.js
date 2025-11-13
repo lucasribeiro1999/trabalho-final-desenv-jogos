@@ -1,8 +1,25 @@
 import * as me from 'melonjs';
+
+import FireProjectile from './fireProjectile.js';
+
+import PlayScreen from '../stages/play.js';
+
 import CONSTANTS from '../constants.js';
 import WeaponEntity from './weapon.js';
 
+const PlayerState = {
+    IDLE: "idle",
+    MOVING: "moving",
+    COLLIDING: "colliding",
+    DYING: "dying"
+}
+
 class PlayerEntity extends me.Entity {
+    currentState = PlayerState.IDLE;
+
+    static maxHealth = CONSTANTS.PLAYER.MAX_HEALTH;
+    currentHealth = 5;
+
     constructor() {
         super(
             me.game.viewport.width / 2,
@@ -112,28 +129,32 @@ class PlayerEntity extends me.Entity {
         const prevY = this.pos.y;
         this.isMoving = false;
 
+        if (this.currentState === PlayerState.DYING) return false
+
+        this.currentState = PlayerState.IDLE;
+
         if (me.input.isKeyPressed("left")) {
             this.pos.x -= this.velx * dt / 1000;
             this.facing = 'left';
-            this.isMoving = true;
+            this.currentState = PlayerState.MOVING
             this.switchToDirection('left');
         }
         if (me.input.isKeyPressed("right")) {
             this.pos.x += this.velx * dt / 1000;
             this.facing = 'right';
-            this.isMoving = true;
+            this.currentState = PlayerState.MOVING
             this.switchToDirection('right');
         }
         if (me.input.isKeyPressed("up")) {
             this.pos.y -= this.vely * dt / 1000;
             this.facing = 'up';
-            this.isMoving = true;
+            this.currentState = PlayerState.MOVING
             this.switchToDirection('up');
         }
         if (me.input.isKeyPressed("down")) {
             this.pos.y += this.vely * dt / 1000;
             this.facing = 'down';
-            this.isMoving = true;
+            this.currentState = PlayerState.MOVING
             this.switchToDirection('down');
         }
         if (!this.isMoving) {
@@ -145,6 +166,33 @@ class PlayerEntity extends me.Entity {
         if (me.input.isKeyPressed("two")) this.switchWeapon(1);
         if (me.input.isKeyPressed("three")) this.switchWeapon(2);
 
+        if (this.currentState === PlayerState.IDLE) {
+            this.switchToIdle();
+        }
+
+        // Disparo automático respeitando a direção/facing
+        {
+            const now = me.timer.getTime();
+            const rate = (typeof FireProjectile.RATE_MS === 'number') ? FireProjectile.RATE_MS : 2000;
+            if (now - this.lastShotAt >= rate) {
+                const b = this.getBounds();
+                const centerX = b.x + this.width / 2;
+                const centerY = b.y + this.height / 2;
+
+                let spawnX = centerX;
+                let spawnY = centerY;
+
+                const offset = 8;
+                if (this.facing === 'up') spawnY = b.top - offset;
+                if (this.facing === 'down') spawnY = b.top + this.height + offset;
+                if (this.facing === 'left') spawnX = b.left - offset;
+                if (this.facing === 'right') spawnX = b.left + this.width + offset;
+
+                me.game.world.addChild(new FireProjectile(spawnX, spawnY, this.facing), 3);
+                this.lastShotAt = now;
+            }
+        }
+
         this.pos.x = me.Math.clamp(this.pos.x, this.minX, this.maxX);
         this.pos.y = me.Math.clamp(this.pos.y, this.minY, this.maxY);
         this._lastValidX = prevX;
@@ -153,17 +201,56 @@ class PlayerEntity extends me.Entity {
         return true;
     }
 
+    takeDamage() {
+        if (this.currentState === PlayerState.COLLIDING) {
+            if (this.currentHealth <= 0) {
+                this.currentHealth = 0;
+
+                this.startDeath();
+            } else {
+                this.currentHealth -= 1
+
+                const currentScreen = me.state.current()
+                if (currentScreen instanceof PlayScreen) {
+                    currentScreen.healthSystem.updateHealth(this.currentHealth);
+                }
+            }
+
+        }
+    }
+
+    startDeath() {
+        this.currentState = PlayerState.DYING;
+
+        this.renderable.setCurrentAnimation("death")
+
+        if (this.body.setCollisionMask) this.body.setCollisionMask(0);
+
+        const parent = this.ancestor || me.game.world;
+
+        setTimeout(() => {
+            if (parent) parent.removeChild(this);
+        }, 1000);
+    }
+
+
     onCollision(response, other) {
         if (!(other?.body)) return false;
+
         if (other.body.collisionType === me.collision.types.ENEMY_OBJECT) {
             if (typeof this._lastValidX === 'number' && typeof this._lastValidY === 'number') {
+                this.currentState = PlayerState.COLLIDING;
+
                 this.pos.x = this._lastValidX;
                 this.pos.y = this._lastValidY;
                 if (this.body && this.body.vel) {
                     this.body.vel.x = 0;
                     this.body.vel.y = 0;
                 }
+            } else {
+                this.currentState = PlayerState.IDLE
             }
+
             return false;
         }
         return false;
