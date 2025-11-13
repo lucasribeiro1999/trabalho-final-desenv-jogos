@@ -4,6 +4,9 @@ const defines = {
         WIDTH: 5,
         HEIGHT: 28
     },
+    PLAYER: {
+        MAX_HEALTH: 5
+    },
     FIRE: {
         RATE_MS: 1000
     },

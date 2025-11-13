@@ -17,6 +17,7 @@ export let GAME_RESOURCES = [
     { name: "map-01", type: "image", src: "src/assets/zombie-apocalypse.png" },
     { name: "filled-heart", type: "image", src: "src/assets/health/filled-heart.png" },
     { name: "empty-heart", type: "image", src: "src/assets/health/empty-heart.png" },
+    { name: "heart", type: "image", src: "src/assets/health/heart.png" },
 
     /* Maps.
      * @example
