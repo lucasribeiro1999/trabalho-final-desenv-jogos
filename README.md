@@ -2,19 +2,20 @@
 
 ## Assets Usados
 
-https://hochupitsu.itch.io/heart-and-mana
-https://thelazystone.itch.io/post-apocalypse-pixel-art-asset-pack
+<img src="./bullet-heaven/src/assets/health/filled-heart.png" alt="drawing" width="64"/> [Pixel Heart and Mana UI by HochuPitsu](https://hochupitsu.itch.io/heart-and-mana)
+
+<img src="./bullet-heaven/src/assets/zombie-axe/idle-animation-preview.gif" alt="drawing" width="64"/>  [Post Apocalypse Pixel Art Asset Pack by TheLazyStone](https://thelazystone.itch.io/post-apocalypse-pixel-art-asset-pack)
 
 ## Etapas
 
 - [ ] Criar o mapa no Tiled
-- [ ] Adicionar sprites e animações dos personagens/inimigos/tiros
-- [ ] Fazer o personagem mover em todas as direções (falta cima, baixo e diagonais)
-- [ ] Fazer os zumbis spawnarem aleatoriamente num circulo em volta do personagem
-- [ ] Fazer os zumbis sempre andarem em direção ao personagem
-- [ ] Adicionar colisão dos zumbis com o personagem
-- [ ] Adicionar colisão dos tiros com os zumbis
-- [ ] Fazer os zumbis droparem moedas ao morrerem
+- [x] Adicionar sprites e animações dos personagens/inimigos/tiros
+- [x] Fazer o personagem mover em todas as direções (falta cima, baixo e diagonais)
+- [x] Fazer os zumbis spawnarem aleatoriamente num circulo em volta do personagem
+- [x] Fazer os zumbis sempre andarem em direção ao personagem
+- [x] Adicionar colisão dos zumbis com o personagem
+- [x] Adicionar colisão dos tiros com os zumbis
+- [x] Fazer os zumbis droparem moedas ao morrerem
 - [ ] Fazer o tiro padrão ser atirado na direção que o personagem anda
 - [ ] Fazer slot de armas pro personagem trocar entre elas
 - [ ] Os zumbis tem chance de dropar uma arma com níveis de raridade
