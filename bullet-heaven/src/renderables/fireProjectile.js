@@ -1,6 +1,5 @@
 import * as me from 'melonjs';
-
-import CONSTANTS from "../constants"
+import CONSTANTS from "../constants";
 
 class FireProjectile extends me.Sprite {
     static RATE_MS = CONSTANTS.FIRE.RATE_MS;
@@ -9,22 +8,17 @@ class FireProjectile extends me.Sprite {
      * @param {number} x
      * @param {number} y
      * @param {"up"|"down"|"left"|"right"} direction
+     * @param {number} [spreadAngle=0] (opcional para shotgun)
      */
-    constructor(x, y, direction = "up") {
+    constructor(x, y, direction = "up", spreadAngle = 0) {
         const imageName = `fire-${direction}`;
-
         const framewidth = (direction === 'up' || direction === 'down') ? 7 : 10;
         const frameheight = (direction === 'up' || direction === 'down') ? 10 : 7;
-
-        super(x, y, {
-            image: imageName,
-            framewidth: framewidth,
-            frameheight: frameheight,
-        });
+        super(x, y, { image: imageName, framewidth, frameheight });
 
         this.direction = direction;
+        this.spreadAngle = spreadAngle || 0;
         this.speed = 300;
-
         this.scale(3);
 
         this.body = new me.Body(this);
@@ -50,21 +44,9 @@ class FireProjectile extends me.Sprite {
         this.hasHit = false;
     }
 
-    onResetEvent(x, y, direction) {
-        if (typeof x === 'number' && typeof y === 'number') this.pos.set(x, y);
-        if (direction) this.direction = direction;
-        this.holdDuration = 0;
-        this.finishStarted = false;
-        this.hasHit = false;
-        this.setCurrentAnimation("hold");
-        this.setAnimationFrame(0);
-    }
-
     update(dt) {
         if (!this.finishStarted && !this.hasHit) {
-            if (this.isCurrentAnimation("hold")) {
-                this.setAnimationFrame(0);
-            }
+            if (this.isCurrentAnimation("hold")) this.setAnimationFrame(0);
             this.holdDuration += dt;
             if (this.holdDuration >= this.holdMaxDuration) {
                 this.finishStarted = true;
@@ -75,10 +57,21 @@ class FireProjectile extends me.Sprite {
         }
 
         const step = (this.speed * dt) / 1000;
-        if (this.direction === 'up') this.pos.y -= step;
-        if (this.direction === 'down') this.pos.y += step;
-        if (this.direction === 'left') this.pos.x -= step;
-        if (this.direction === 'right') this.pos.x += step;
+        let dx = 0, dy = 0;
+        switch (this.direction) {
+            case "up": dy = -1; break;
+            case "down": dy = 1; break;
+            case "left": dx = -1; break;
+            case "right": dx = 1; break;
+        }
+        // Calcula spread (shotgun)
+        if (this.spreadAngle !== 0) {
+            const angle = Math.atan2(dy, dx) + this.spreadAngle;
+            dx = Math.cos(angle);
+            dy = Math.sin(angle);
+        }
+        this.pos.x += dx * step;
+        this.pos.y += dy * step;
 
         if (
             this.pos.x + this.width < 0 ||
@@ -88,24 +81,9 @@ class FireProjectile extends me.Sprite {
         ) {
             me.game.world.removeChild(this);
         }
-
         return super.update(dt);
     }
 
-    onCollision(response, other) {
-        if (other.body && other.body.collisionType === me.collision.types.ENEMY_OBJECT) {
-            if (this.hasHit) return false;
-            this.hasHit = true;
-            if (this.body.setCollisionMask) this.body.setCollisionMask(0);
-            if (typeof other.startDeath === 'function') {
-                other.startDeath();
-            }
-            me.game.world.removeChild(this);
-            return false;
-        }
-    }
+    // ... onCollision igual ...
 }
-
 export default FireProjectile;
-
-

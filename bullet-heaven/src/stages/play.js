@@ -1,4 +1,4 @@
-import * as me from "melonjs";
+import * as me from 'melonjs';
 
 import { GameData } from "../gameData.js";
 
@@ -6,6 +6,7 @@ import XPHUD from "../renderables/xpHud.js";
 import PlayerEntity from "../renderables/player.js";
 
 import EnemyManager from "../managers/enemy-manager.js";
+import WeaponHudContainer from "../renderables/weaponHudContainer.js"; // Importação do HUD das armas
 import { HealthSystem } from '../managers/healthSystem.js';
 
 
@@ -15,7 +16,6 @@ class PlayScreen extends me.Stage {
         GameData.xp = 0;
 
         me.game.world.backgroundColor.parseCSS("#707B64");
-
         const bgImage = me.loader.getImage("map-01");
         if (bgImage) {
             const bg = new me.Renderable(
@@ -44,14 +44,15 @@ class PlayScreen extends me.Stage {
             };
             me.game.world.addChild(bg, 0);
         }
-
         me.game.playerAtlas = new me.TextureAtlas(
             me.loader.getJSON("player"),
             me.loader.getImage("player")
         );
-
         this.player = new PlayerEntity();
         me.game.world.addChild(this.player, 1);
+
+        // HUD das armas: sempre visível sobre o jogo
+        me.game.world.addChild(new WeaponHudContainer(this.player), 99);
 
         this.enemyManager = new EnemyManager();
         this.enemyManager.createEnemies();
@@ -72,6 +73,11 @@ class PlayScreen extends me.Stage {
         me.input.bindKey(me.input.KEY.W, "up");
         me.input.bindKey(me.input.KEY.DOWN, "down");
         me.input.bindKey(me.input.KEY.S, "down");
+        me.input.bindKey(me.input.KEY.SPACE, "space"); // disparo
+
+        me.input.bindKey(me.input.KEY.ONE, "one"); // slot 1
+        me.input.bindKey(me.input.KEY.TWO, "two"); // slot 2
+        me.input.bindKey(me.input.KEY.THREE, "three"); // slot 3
     }
 
     onDestroyEvent() {
@@ -79,8 +85,15 @@ class PlayScreen extends me.Stage {
         me.input.unbindKey(me.input.KEY.RIGHT);
         me.input.unbindKey(me.input.KEY.A);
         me.input.unbindKey(me.input.KEY.D);
-
+        me.input.unbindKey(me.input.KEY.UP);
+        me.input.unbindKey(me.input.KEY.W);
+        me.input.unbindKey(me.input.KEY.DOWN);
+        me.input.unbindKey(me.input.KEY.S);
         me.input.unbindKey(me.input.KEY.SPACE);
+
+        me.input.unbindKey(me.input.KEY.ONE);
+        me.input.unbindKey(me.input.KEY.TWO);
+        me.input.unbindKey(me.input.KEY.THREE);
     }
 
     checkIfLoss(y) {
