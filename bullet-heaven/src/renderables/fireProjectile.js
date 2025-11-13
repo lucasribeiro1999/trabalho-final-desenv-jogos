@@ -1,9 +1,6 @@
 import * as me from 'melonjs';
-import CONSTANTS from "../constants";
 
 class FireProjectile extends me.Sprite {
-    static RATE_MS = CONSTANTS.FIRE.RATE_MS;
-
     /**
      * @param {number} x
      * @param {number} y
@@ -83,7 +80,6 @@ class FireProjectile extends me.Sprite {
         }
         return super.update(dt);
     }
-
-    // ... onCollision igual ...
 }
+
 export default FireProjectile;

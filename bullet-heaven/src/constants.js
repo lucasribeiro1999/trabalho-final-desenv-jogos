@@ -15,6 +15,21 @@ const defines = {
     },
     XP: {
         PER_ZOMBIE: 10 // quanto de XP ganha por zumbi morto
+    },
+    WEAPONS: {
+        PISTOL: {
+            NAME: "pistol",
+            RATE_MS: 1000
+        },
+        RIFLE: {
+            NAME: "rifle",
+            RATE_MS: 320
+        },
+        SHOTGUN: {
+            NAME: "shotgun",
+            RATE_MS: 3000
+        },
+
     }
 };
 

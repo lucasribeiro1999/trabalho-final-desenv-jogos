@@ -1,4 +1,5 @@
 import * as me from "melonjs";
+
 import WeaponHud from "./weaponHud.js";
 
 class WeaponHudContainer extends me.Container {

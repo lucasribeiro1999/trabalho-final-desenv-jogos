@@ -34,7 +34,8 @@ class WeaponHud extends me.Renderable {
             renderer.setColor("#222");
             renderer.fillRect(x, y, 40, 40);
 
-            if (this.player.currentWeaponSlot === i) {
+
+            if (this.player.currentWeapon?.currentType === this.player.weapons[i]) {
                 renderer.setColor("#FFD700");
                 renderer.strokeRect(x, y, 40, 40);
             }

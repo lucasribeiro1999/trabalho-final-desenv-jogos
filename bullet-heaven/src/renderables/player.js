@@ -1,11 +1,10 @@
 import * as me from 'melonjs';
 
-import FireProjectile from './fireProjectile.js';
+import WeaponEntity from './weapon.js';
 
 import PlayScreen from '../stages/play.js';
 
 import CONSTANTS from '../constants.js';
-import WeaponEntity from './weapon.js';
 
 const PlayerState = {
     IDLE: "idle",
@@ -55,31 +54,34 @@ class PlayerEntity extends me.Entity {
 
         // Três slots de armas
         this.weapons = [
-            new WeaponEntity(this, "pistola"),
-            new WeaponEntity(this, "fuzil de assalto"),
-            new WeaponEntity(this, "shotgun")
+            CONSTANTS.WEAPONS.PISTOL.NAME,
+            CONSTANTS.WEAPONS.RIFLE.NAME,
+            CONSTANTS.WEAPONS.SHOTGUN.NAME
         ];
-        this.currentWeaponSlot = 0;
-        me.game.world.addChild(this.weapons[0], 3);
+        this.currentWeapon = new WeaponEntity(this, this.weapons[0]);
+        me.game.world.addChild(this.currentWeapon, 3);
     }
 
     switchWeapon(slot) {
-    if (
-        slot >= 0 &&
-        slot < this.weapons.length &&
-        slot !== this.currentWeaponSlot
-    ) {
-        // Remove arma atual, se houver
-        if (this.weapons[this.currentWeaponSlot]) {
-            me.game.world.removeChild(this.weapons[this.currentWeaponSlot]);
-        }
-        this.currentWeaponSlot = slot;
-        // Adiciona arma nova, se houver
-        if (this.weapons[slot]) {
-            me.game.world.addChild(this.weapons[slot], 3);
+        console.log(slot, this.weapons[slot]);
+
+        if (
+            slot >= 0 &&
+            slot < this.weapons.length &&
+            this.weapons?.[slot] !== this.currentWeapon?.currentType
+        ) {
+            // Remove arma atual, se houver
+            if (this.currentWeapon) {
+                me.game.world.removeChild(this.currentWeapon);
+            }
+
+            // Adiciona arma nova, se houver
+            if (this.weapons[slot]) {
+                this.currentWeapon = new WeaponEntity(this, this.weapons[slot]);
+                me.game.world.addChild(this.currentWeapon, 3);
+            }
         }
     }
-}
 
 
     setupAnimations() {
@@ -168,29 +170,6 @@ class PlayerEntity extends me.Entity {
 
         if (this.currentState === PlayerState.IDLE) {
             this.switchToIdle();
-        }
-
-        // Disparo automático respeitando a direção/facing
-        {
-            const now = me.timer.getTime();
-            const rate = (typeof FireProjectile.RATE_MS === 'number') ? FireProjectile.RATE_MS : 2000;
-            if (now - this.lastShotAt >= rate) {
-                const b = this.getBounds();
-                const centerX = b.x + this.width / 2;
-                const centerY = b.y + this.height / 2;
-
-                let spawnX = centerX;
-                let spawnY = centerY;
-
-                const offset = 8;
-                if (this.facing === 'up') spawnY = b.top - offset;
-                if (this.facing === 'down') spawnY = b.top + this.height + offset;
-                if (this.facing === 'left') spawnX = b.left - offset;
-                if (this.facing === 'right') spawnX = b.left + this.width + offset;
-
-                me.game.world.addChild(new FireProjectile(spawnX, spawnY, this.facing), 3);
-                this.lastShotAt = now;
-            }
         }
 
         this.pos.x = me.Math.clamp(this.pos.x, this.minX, this.maxX);
