@@ -1,10 +1,13 @@
-// src/stages/play.js
 import * as me from "melonjs";
 
-import PlayerEntity from "../renderables/player.js";
-import EnemyManager from "../managers/enemy-manager.js";
-import XPHUD from "../renderables/xpHud.js";
 import { GameData } from "../gameData.js";
+
+import XPHUD from "../renderables/xpHud.js";
+import PlayerEntity from "../renderables/player.js";
+
+import EnemyManager from "../managers/enemy-manager.js";
+import { HealthSystem } from '../managers/healthSystem.js';
+
 
 class PlayScreen extends me.Stage {
     onResetEvent() {
@@ -57,6 +60,9 @@ class PlayScreen extends me.Stage {
         // HUD de XP no topo (z-index alto)
         this.xpHud = new XPHUD();
         me.game.world.addChild(this.xpHud, 9999);
+
+        this.healthSystem = new HealthSystem();
+        me.game.world.addChild(this.healthSystem, 9999);
 
         me.input.bindKey(me.input.KEY.LEFT, "left");
         me.input.bindKey(me.input.KEY.A, "left");
