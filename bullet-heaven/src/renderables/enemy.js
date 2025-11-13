@@ -1,8 +1,9 @@
-import * as me from 'melonjs';
+// src/renderables/enemy.js
+import * as me from "melonjs";
 
-import PlayerEntity from './player.js';
-
-import CONSTANTS from '../constants.js';
+import PlayerEntity from "./player.js";
+import CONSTANTS from "../constants.js";
+import { GameData } from "../gameData.js";
 
 class EnemyEntity extends me.Sprite {
     constructor(x, y) {
@@ -16,7 +17,6 @@ class EnemyEntity extends me.Sprite {
         this.body.addShape(new me.Rect(0, 0, this.width, this.height));
         this.body.collisionType = me.collision.types.ENEMY_OBJECT;
         this.body.ignoreGravity = true;
-
 
         if (this.body.setStatic) this.body.setStatic(true);
         this.body.vel.set(0, 0);
@@ -32,7 +32,7 @@ class EnemyEntity extends me.Sprite {
         this.addAnimation("idle", [0, 1, 2, 3], 350);
         this.setCurrentAnimation("idle");
 
-        this.scale(CONSTANTS.SPRITE.SCALE_UP)
+        this.scale(CONSTANTS.SPRITE.SCALE_UP);
         this.speed = 80;
         this.isDying = false;
     }
@@ -41,6 +41,11 @@ class EnemyEntity extends me.Sprite {
         if (this.isDying) return;
         this.isDying = true;
         if (this.body.setCollisionMask) this.body.setCollisionMask(0);
+
+        // >>> GANHO DE XP AO MATAR ZUMBI <<<
+        GameData.xp += CONSTANTS.XP.PER_ZOMBIE;
+        console.log("XP atual:", GameData.xp);
+
 
         const parent = this.ancestor || me.game.world;
 
@@ -54,23 +59,21 @@ class EnemyEntity extends me.Sprite {
             parent.removeChild(deathSprite);
         });
         deathSprite.scale(CONSTANTS.SPRITE.SCALE_UP);
-        parent.addChild(deathSprite, (typeof this.z === 'number' ? this.z : 2));
+        parent.addChild(deathSprite, typeof this.z === "number" ? this.z : 2);
 
         if (parent) parent.removeChild(this);
     }
 
-    /**
-     * @param response
-     * @param other
-     * @returns {boolean}
-     */
     onCollision(response, other) {
         if (other.body.collisionType === me.collision.types.PROJECTILE_OBJECT) {
             this.startDeath();
             return false;
         }
         if (other.body.collisionType === me.collision.types.PLAYER_OBJECT) {
-            if (typeof this._lastValidX === 'number' && typeof this._lastValidY === 'number') {
+            if (
+                typeof this._lastValidX === "number" &&
+                typeof this._lastValidY === "number"
+            ) {
                 this.pos.x = this._lastValidX;
                 this.pos.y = this._lastValidY;
             }
