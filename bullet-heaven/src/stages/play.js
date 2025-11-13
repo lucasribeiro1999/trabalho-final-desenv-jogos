@@ -4,9 +4,9 @@ import { GameData } from "../gameData.js";
 
 import XPHUD from "../renderables/xpHud.js";
 import PlayerEntity from "../renderables/player.js";
+import WeaponHudContainer from "../renderables/ui/weaponHudContainer.js"; // Importação do HUD das armas
 
 import EnemyManager from "../managers/enemy-manager.js";
-import WeaponHudContainer from "../renderables/weaponHudContainer.js"; // Importação do HUD das armas
 import { HealthSystem } from '../managers/healthSystem.js';
 
 
@@ -73,11 +73,11 @@ class PlayScreen extends me.Stage {
         me.input.bindKey(me.input.KEY.W, "up");
         me.input.bindKey(me.input.KEY.DOWN, "down");
         me.input.bindKey(me.input.KEY.S, "down");
-        me.input.bindKey(me.input.KEY.SPACE, "space"); // disparo
+        me.input.bindKey(me.input.KEY.SPACE, "space");
 
-        me.input.bindKey(me.input.KEY.ONE, "one"); // slot 1
-        me.input.bindKey(me.input.KEY.TWO, "two"); // slot 2
-        me.input.bindKey(me.input.KEY.THREE, "three"); // slot 3
+        me.input.bindKey(me.input.KEY.NUM1, "one");
+        me.input.bindKey(me.input.KEY.NUM2, "two");
+        me.input.bindKey(me.input.KEY.NUM3, "three");
     }
 
     onDestroyEvent() {
@@ -91,9 +91,9 @@ class PlayScreen extends me.Stage {
         me.input.unbindKey(me.input.KEY.S);
         me.input.unbindKey(me.input.KEY.SPACE);
 
-        me.input.unbindKey(me.input.KEY.ONE);
-        me.input.unbindKey(me.input.KEY.TWO);
-        me.input.unbindKey(me.input.KEY.THREE);
+        me.input.unbindKey(me.input.KEY.NUM1);
+        me.input.unbindKey(me.input.KEY.NUM2);
+        me.input.unbindKey(me.input.KEY.NUM3);
     }
 
     checkIfLoss(y) {
