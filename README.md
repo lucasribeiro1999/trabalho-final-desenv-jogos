@@ -16,8 +16,8 @@
 - [x] Adicionar colisão dos zumbis com o personagem
 - [x] Adicionar colisão dos tiros com os zumbis
 - [x] Fazer os zumbis droparem moedas ao morrerem
-- [ ] Fazer o tiro padrão ser atirado na direção que o personagem anda
-- [ ] Fazer slot de armas pro personagem trocar entre elas
+- [x] Fazer o tiro padrão ser atirado na direção que o personagem anda
+- [x] Fazer slot de armas pro personagem trocar entre elas
 - [ ] Os zumbis tem chance de dropar uma arma com níveis de raridade
 - [ ] Armas iguais e de mesmo nível podem ser usadas pra craftar a mesma arma um nível acima
 - [ ] A cada horda abre uma loja com itens aleatórios que o personagem pode comprar para se equipar
