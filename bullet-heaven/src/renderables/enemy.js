@@ -6,6 +6,9 @@ import CONSTANTS from "../constants.js";
 import { GameData } from "../gameData.js";
 
 class EnemyEntity extends me.Sprite {
+    attackCooldown = 1000;
+    lastAttackTime = 0;
+
     constructor(x, y) {
         super(x, y, {
             image: "zombie-axe-idle",
@@ -76,6 +79,12 @@ class EnemyEntity extends me.Sprite {
             ) {
                 this.pos.x = this._lastValidX;
                 this.pos.y = this._lastValidY;
+
+                let now = me.timer.getTime();
+                if (now - this.lastAttackTime > this.attackCooldown) {
+                    other.takeDamage();
+                    this.lastAttackTime = now;
+                }
             }
             return false;
         }
