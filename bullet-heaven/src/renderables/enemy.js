@@ -1,6 +1,5 @@
-// src/renderables/enemy.js
 import * as me from "melonjs";
-
+import PlayScreen from "../stages/play.js";
 import PlayerEntity from "./player.js";
 import CONSTANTS from "../constants.js";
 import { GameData } from "../gameData.js";
@@ -15,7 +14,6 @@ class EnemyEntity extends me.Sprite {
             framewidth: 13,
             frameheight: 18,
         });
-
         this.body = new me.Body(this);
         this.body.addShape(new me.Rect(0, 0, this.width, this.height));
         this.body.collisionType = me.collision.types.ENEMY_OBJECT;
@@ -45,10 +43,9 @@ class EnemyEntity extends me.Sprite {
         this.isDying = true;
         if (this.body.setCollisionMask) this.body.setCollisionMask(0);
 
-        // >>> GANHO DE XP AO MATAR ZUMBI <<<
+        // GANHO DE XP AO MATAR ZUMBI
         GameData.xp += CONSTANTS.XP.PER_ZOMBIE;
         console.log("XP atual:", GameData.xp);
-
 
         const parent = this.ancestor || me.game.world;
 
@@ -91,6 +88,9 @@ class EnemyEntity extends me.Sprite {
     }
 
     update(dt) {
+        // PAUSA TOTAL
+        if (PlayScreen.isPaused) return false;
+
         super.update(dt);
 
         const prevX = this.pos.x;
@@ -99,13 +99,11 @@ class EnemyEntity extends me.Sprite {
         if (this.isDying) {
             return true;
         }
-
         const players = me.game.world.getChildByType(PlayerEntity);
         if (players && players.length > 0) {
             const player = players[0];
             const targetX = player.getBounds().x;
             const targetY = player.getBounds().y;
-
             const dx = targetX - this.getBounds().centerX;
             const dy = targetY - this.getBounds().centerY;
             const len = Math.hypot(dx, dy);

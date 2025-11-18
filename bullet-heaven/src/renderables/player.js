@@ -1,9 +1,6 @@
 import * as me from 'melonjs';
-
 import WeaponEntity from './weapon.js';
-
 import PlayScreen from '../stages/play.js';
-
 import CONSTANTS from '../constants.js';
 
 const PlayerState = {
@@ -15,7 +12,6 @@ const PlayerState = {
 
 class PlayerEntity extends me.Entity {
     currentState = PlayerState.IDLE;
-
     static maxHealth = CONSTANTS.PLAYER.MAX_HEALTH;
     currentHealth = 5;
 
@@ -64,18 +60,14 @@ class PlayerEntity extends me.Entity {
 
     switchWeapon(slot) {
         console.log(slot, this.weapons[slot]);
-
         if (
             slot >= 0 &&
             slot < this.weapons.length &&
             this.weapons?.[slot] !== this.currentWeapon?.currentType
         ) {
-            // Remove arma atual, se houver
             if (this.currentWeapon) {
                 me.game.world.removeChild(this.currentWeapon);
             }
-
-            // Adiciona arma nova, se houver
             if (this.weapons[slot]) {
                 this.currentWeapon = new WeaponEntity(this, this.weapons[slot]);
                 me.game.world.addChild(this.currentWeapon, 3);
@@ -83,9 +75,7 @@ class PlayerEntity extends me.Entity {
         }
     }
 
-
     setupAnimations() {
-        // Ajuste conforme seus assets JSON e atlas
         const animations = me.loader.getJSON("player").animations;
         const idleFrames = animations["idle/idle"];
         const deathFrames = animations["death/death"];
@@ -125,6 +115,9 @@ class PlayerEntity extends me.Entity {
     }
 
     update(dt) {
+        // PAUSA TOTAL
+        if (PlayScreen.isPaused) return false;
+
         super.update(dt);
 
         const prevX = this.pos.x;
@@ -194,15 +187,12 @@ class PlayerEntity extends me.Entity {
                     currentScreen.healthSystem.updateHealth(this.currentHealth);
                 }
             }
-
         }
     }
 
     startDeath() {
         this.currentState = PlayerState.DYING;
-
         this.renderable.setCurrentAnimation("death")
-
         if (this.body.setCollisionMask) this.body.setCollisionMask(0);
 
         const parent = this.ancestor || me.game.world;
@@ -211,7 +201,6 @@ class PlayerEntity extends me.Entity {
             if (parent) parent.removeChild(this);
         }, 1000);
     }
-
 
     onCollision(response, other) {
         if (!(other?.body)) return false;
@@ -229,7 +218,6 @@ class PlayerEntity extends me.Entity {
             } else {
                 this.currentState = PlayerState.IDLE
             }
-
             return false;
         }
         return false;
