@@ -5,9 +5,11 @@ class FireProjectile extends me.Sprite {
      * @param {number} x
      * @param {number} y
      * @param {"up"|"down"|"left"|"right"} direction
-     * @param {number} [spreadAngle=0] (opcional para shotgun)
+     * @param {number} [spreadAngle=0]
+     * @param {number} [damage=1]
+     * @param {number} [range=400]
      */
-    constructor(x, y, direction = "up", spreadAngle = 0) {
+    constructor(x, y, direction = "up", spreadAngle = 0, damage = 1, range = 400) {
         const imageName = `fire-${direction}`;
         const framewidth = (direction === 'up' || direction === 'down') ? 7 : 10;
         const frameheight = (direction === 'up' || direction === 'down') ? 10 : 7;
@@ -19,13 +21,11 @@ class FireProjectile extends me.Sprite {
         this.scale(3);
 
         this.body = new me.Body(this);
-        const scaledWidth = this.width;
-        const scaledHeight = this.height;
-        this.body.addShape(new me.Rect(0, 0, scaledWidth, scaledHeight));
+        this.body.addShape(new me.Rect(0, 0, this.width, this.height));
         this.body.collisionType = me.collision.types.PROJECTILE_OBJECT;
         this.body.ignoreGravity = true;
         if (this.body.setMaxVelocity) this.body.setMaxVelocity(400, 400);
-        if (this.body.setCollisionMask) this.body.setCollisionMask(me.collision.types.ENEMY_OBJECT);
+        this.body.setCollisionMask(me.collision.types.ENEMY_OBJECT);
         if (this.body.setSensor) this.body.setSensor(true);
 
         this.addAnimation("hold", [0], 10000);
@@ -39,6 +39,28 @@ class FireProjectile extends me.Sprite {
 
         this.alwaysUpdate = true;
         this.hasHit = false;
+
+        // Novos campos para upgrade
+        this.damage = damage;
+        this.maxRange = range;
+        this.traveled = 0;
+    }
+
+    /**
+     * Callback automático de colisão no melonJS v8+.
+     */
+    onCollision(response, other) {
+        if (!this.hasHit && other.body && other.body.collisionType === me.collision.types.ENEMY_OBJECT) {
+            this.hasHit = true;
+            if (typeof other.takeDamage === "function") {
+                other.takeDamage(this.damage);
+            }
+            this.setCurrentAnimation("finish", () => {
+                me.game.world.removeChild(this);
+            });
+            return false;
+        }
+        return false;
     }
 
     update(dt) {
@@ -61,7 +83,6 @@ class FireProjectile extends me.Sprite {
             case "left": dx = -1; break;
             case "right": dx = 1; break;
         }
-        // Calcula spread (shotgun)
         if (this.spreadAngle !== 0) {
             const angle = Math.atan2(dy, dx) + this.spreadAngle;
             dx = Math.cos(angle);
@@ -69,8 +90,10 @@ class FireProjectile extends me.Sprite {
         }
         this.pos.x += dx * step;
         this.pos.y += dy * step;
+        this.traveled += step;
 
         if (
+            this.traveled > this.maxRange ||
             this.pos.x + this.width < 0 ||
             this.pos.x > me.game.viewport.width ||
             this.pos.y + this.height < 0 ||
