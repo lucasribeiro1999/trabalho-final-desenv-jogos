@@ -1,10 +1,8 @@
 import * as me from 'melonjs';
-
 import WeaponEntity from './weapon.js';
-
 import PlayScreen from '../stages/play.js';
-
 import CONSTANTS from '../constants.js';
+import { GameData } from '../gameData.js';
 
 const PlayerState = {
     IDLE: "idle",
@@ -52,40 +50,41 @@ class PlayerEntity extends me.Entity {
 
         this.setupAnimations();
 
-        // Três slots de armas
+        // Armas no inventário. Inicialmente só pistola. Permite upgrade/desbloqueio por drop.
         this.weapons = [
             CONSTANTS.WEAPONS.PISTOL.NAME,
             CONSTANTS.WEAPONS.RIFLE.NAME,
             CONSTANTS.WEAPONS.SHOTGUN.NAME
         ];
-        this.currentWeapon = new WeaponEntity(this, this.weapons[0]);
+        this.weaponLevels = {
+            pistol: GameData.weaponLevels.pistol ?? 1,
+            rifle: GameData.weaponLevels.rifle ?? 1,
+            shotgun: GameData.weaponLevels.shotgun ?? 1
+        };
+        this.currentWeaponSlot = 0;
+        this.currentWeapon = new WeaponEntity(this, this.weapons[this.currentWeaponSlot]);
         me.game.world.addChild(this.currentWeapon, 3);
     }
 
     switchWeapon(slot) {
-        console.log(slot, this.weapons[slot]);
-
         if (
             slot >= 0 &&
             slot < this.weapons.length &&
             this.weapons?.[slot] !== this.currentWeapon?.currentType
         ) {
-            // Remove arma atual, se houver
+            // Remove arma atual
             if (this.currentWeapon) {
                 me.game.world.removeChild(this.currentWeapon);
             }
-
-            // Adiciona arma nova, se houver
             if (this.weapons[slot]) {
                 this.currentWeapon = new WeaponEntity(this, this.weapons[slot]);
                 me.game.world.addChild(this.currentWeapon, 3);
             }
+            this.currentWeaponSlot = slot;
         }
     }
 
-
     setupAnimations() {
-        // Ajuste conforme seus assets JSON e atlas
         const animations = me.loader.getJSON("player").animations;
         const idleFrames = animations["idle/idle"];
         const deathFrames = animations["death/death"];
@@ -93,7 +92,6 @@ class PlayerEntity extends me.Entity {
         const runningUpFrames = animations["running/up/up"];
         const runningLeftFrames = animations["running/left/left"];
         const runningRigthFrames = animations["running/right/right"];
-
         this.renderable = me.game.playerAtlas.createAnimationFromName([
             ...idleFrames,
             ...deathFrames,
@@ -140,24 +138,28 @@ class PlayerEntity extends me.Entity {
             this.facing = 'left';
             this.currentState = PlayerState.MOVING
             this.switchToDirection('left');
+            this.isMoving = true;
         }
         if (me.input.isKeyPressed("right")) {
             this.pos.x += this.velx * dt / 1000;
             this.facing = 'right';
             this.currentState = PlayerState.MOVING
             this.switchToDirection('right');
+            this.isMoving = true;
         }
         if (me.input.isKeyPressed("up")) {
             this.pos.y -= this.vely * dt / 1000;
             this.facing = 'up';
             this.currentState = PlayerState.MOVING
             this.switchToDirection('up');
+            this.isMoving = true;
         }
         if (me.input.isKeyPressed("down")) {
             this.pos.y += this.vely * dt / 1000;
             this.facing = 'down';
             this.currentState = PlayerState.MOVING
             this.switchToDirection('down');
+            this.isMoving = true;
         }
         if (!this.isMoving) {
             this.switchToIdle();
@@ -172,10 +174,21 @@ class PlayerEntity extends me.Entity {
             this.switchToIdle();
         }
 
+        // Sincroniza limites (paredes)
         this.pos.x = me.Math.clamp(this.pos.x, this.minX, this.maxX);
         this.pos.y = me.Math.clamp(this.pos.y, this.minY, this.maxY);
         this._lastValidX = prevX;
         this._lastValidY = prevY;
+
+        // Sincroniza níveis das armas com GameData (caso ganhe por drop ou XP)
+        this.weaponLevels.pistol = GameData.weaponLevels.pistol;
+        this.weaponLevels.rifle = GameData.weaponLevels.rifle;
+        this.weaponLevels.shotgun = GameData.weaponLevels.shotgun;
+
+        // Opcional: Atualize a arma equipada se o nível aumentar
+        if (this.currentWeapon?.refreshStatsFromLevel) {
+            this.currentWeapon.refreshStatsFromLevel();
+        }
 
         return true;
     }
@@ -184,34 +197,43 @@ class PlayerEntity extends me.Entity {
         if (this.currentState === PlayerState.COLLIDING) {
             if (this.currentHealth <= 0) {
                 this.currentHealth = 0;
-
                 this.startDeath();
             } else {
                 this.currentHealth -= 1
-
                 const currentScreen = me.state.current()
                 if (currentScreen instanceof PlayScreen) {
                     currentScreen.healthSystem.updateHealth(this.currentHealth);
                 }
             }
-
         }
     }
 
     startDeath() {
         this.currentState = PlayerState.DYING;
-
-        this.renderable.setCurrentAnimation("death")
-
+        this.renderable.setCurrentAnimation("death");
         if (this.body.setCollisionMask) this.body.setCollisionMask(0);
-
         const parent = this.ancestor || me.game.world;
-
         setTimeout(() => {
             if (parent) parent.removeChild(this);
         }, 1000);
     }
 
+    // NOVO: coleta/desbloqueio de armas via drop
+    addWeapon(type, level, rarity) {
+        // Atualiza arma no inventário se nível for maior
+        if (level > (this.weaponLevels[type] ?? 1)) {
+            this.weaponLevels[type] = level;
+            GameData.weaponLevels[type] = level;
+            // Troca de arma automática pode ser feita aqui se preferir
+            // this.switchWeapon(this.weapons.indexOf(type));
+        }
+        // Se for arma nova, garante que está no slot
+        if (!this.weapons.includes(type)) {
+            this.weapons.push(type);
+        }
+        // Mensagem de coleta (debug)
+        console.log(`Arma coletada: ${type}, nível ${level}, raridade ${rarity}`);
+    }
 
     onCollision(response, other) {
         if (!(other?.body)) return false;
@@ -219,7 +241,6 @@ class PlayerEntity extends me.Entity {
         if (other.body.collisionType === me.collision.types.ENEMY_OBJECT) {
             if (typeof this._lastValidX === 'number' && typeof this._lastValidY === 'number') {
                 this.currentState = PlayerState.COLLIDING;
-
                 this.pos.x = this._lastValidX;
                 this.pos.y = this._lastValidY;
                 if (this.body && this.body.vel) {
@@ -227,11 +248,19 @@ class PlayerEntity extends me.Entity {
                     this.body.vel.y = 0;
                 }
             } else {
-                this.currentState = PlayerState.IDLE
+                this.currentState = PlayerState.IDLE;
             }
-
             return false;
         }
+
+        // NOVO: coleta de arma via drop
+        if (other.body.collisionType === me.collision.types.COLLECTABLE_OBJECT) {
+            if (typeof other.onCollision === "function") {
+                other.onCollision(response, this);
+            }
+            return false;
+        }
+
         return false;
     }
 }

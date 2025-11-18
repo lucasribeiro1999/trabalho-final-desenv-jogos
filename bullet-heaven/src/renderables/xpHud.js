@@ -4,7 +4,6 @@ import { GameData } from "../gameData.js";
 
 class XPHUD extends me.Text {
     constructor() {
-        // posição (10,10) e config do texto
         super(10, 10, {
             font: "Arial",
             size: 24,
@@ -13,22 +12,29 @@ class XPHUD extends me.Text {
             textBaseline: "top",
         });
 
-        // HUD fixo na tela
         this.floating = true;
         this.alwaysUpdate = true;
 
-        this.lastXP = -1;
-        this.setText("XP: 0");
+        this.lastText = "";
+        this.setText(this.formatText());
+    }
+
+    formatText() {
+        const wl = GameData.weaponLevels || {};
+        const p = wl.pistol ?? 1;
+        const r = wl.rifle ?? 1;
+        const s = wl.shotgun ?? 1;
+        return `XP: ${GameData.xp} | P:${p} R:${r} S:${s}`;
     }
 
     update(dt) {
-        // só atualiza se o XP mudou
-        if (GameData.xp !== this.lastXP) {
-            this.lastXP = GameData.xp;
-            this.setText(`XP: ${this.lastXP}`);
-            return true; // precisa redesenhar
+        const newText = this.formatText();
+        if (newText !== this.lastText) {
+            this.lastText = newText;
+            this.setText(newText);
+            return true;
         }
-        return false; // nada mudou
+        return false;
     }
 }
 
