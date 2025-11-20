@@ -27,6 +27,11 @@ export let GAME_RESOURCES = [
     { name: "rifle", type: "image", src: "src/assets/weapons/rifle.png" },
     { name: "pistol", type: "image", src: "src/assets/weapons/pistol.png" },
     { name: "shotgun", type: "image", src: "src/assets/weapons/shotgun.png" },
+    { name: "heal", type: "image", src: "src/assets/upgrades/heal.png" },
+    { name: "luck-increase", type: "image", src: "src/assets/upgrades/luck-increase.png" },
+    { name: "more-max-health", type: "image", src: "src/assets/upgrades/more-max-health.png" },
+    { name: "move-speed-increase", type: "image", src: "src/assets/upgrades/move-speed-increase.png" },
+    { name: "xp-drop-increase", type: "image", src: "src/assets/upgrades/xp-drop-increase.png" },
 
     /* Maps.
      * @example

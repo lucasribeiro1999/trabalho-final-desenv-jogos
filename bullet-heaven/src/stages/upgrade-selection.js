@@ -1,26 +1,22 @@
 import * as me from 'melonjs'
 
+import { UpgradeSystem } from '../managers/upgradeSystem';
+
 me.state.UPGRADE_SELECTION = 0;
 
 export class UpgradeSelectionScreen extends me.Stage {
     onResetEvent() {
-        const text = new me.Text(0, 0, {
+        me.game.world.backgroundColor.parseCSS("#17171F");
+
+        const text = new me.Text((me.game.viewport.width / 2) - 144, 64, {
             text: "Choose your upgrade!",
             font: "Arial",
             size: 32,
             fillStyle: "#fff",
         });
-        text.pos.set(me.game.viewport.width / 2, me.game.viewport.height / 2);
         me.game.world.addChild(text);
 
-        const button = new me.GUI_Object(
-            me.game.viewport.width / 2 - 50,
-            me.game.viewport.height / 2 + 50,
-            { image: me.loader.getImage("button-not-pressed") }
-        );
-        button.onClick = () => {
-            me.state.change(me.state.PLAY);
-        };
-        me.game.world.addChild(button);
+        const upgradeSystem = new UpgradeSystem()
+        me.game.world.addChild(upgradeSystem, 9999)
     }
 }

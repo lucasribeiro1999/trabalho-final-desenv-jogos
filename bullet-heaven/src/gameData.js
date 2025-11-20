@@ -5,5 +5,6 @@ export const GameData = {
         rifle: 1,
         shotgun: 1
     },
-    currentWave: 0
+    currentWave: 0,
+    activeUpgrades: new Map()
 };
