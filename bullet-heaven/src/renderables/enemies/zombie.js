@@ -97,7 +97,7 @@ export class Zombie extends me.Sprite {
         // Efeito visual de morte
         const parent = this.ancestor || me.game.world;
         const deathSprite = new me.Sprite(this.pos.x, this.pos.y, {
-            image: me.loader.getImage(image),
+            image: image,
             framewidth: frameWidth,
             frameheight: frameHeight,
         });
