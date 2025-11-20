@@ -1,52 +1,56 @@
 import * as me from "melonjs";
 
-class WeaponHud extends me.Renderable {
-    constructor(player) {
+import CONSTANTS from "../../constants"
+
+const sprites = {
+    [CONSTANTS.WEAPONS.RIFLE.NAME]: me.loader.getImage("rifle"),
+    [CONSTANTS.WEAPONS.PISTOL.NAME]: me.loader.getImage("pistol"),
+    [CONSTANTS.WEAPONS.SHOTGUN.NAME]: me.loader.getImage("shotgun")
+}
+
+class WeaponHud extends me.UISpriteElement {
+    constructor(x, y, player, weaponType, parent, isActive) {
         super(
-            me.game.viewport.width / 2 - 80,
-            me.game.viewport.height - 50,
-            160, 40
+            x,
+            y,
+            {
+                image: "cell",
+                framewidth: 19,
+                frameheight: 20
+            }
         );
-        this.player = player;
+
+        this.player = player
+        this.parent = parent
+        this.weaponType = weaponType
+        this.isActive = isActive
+
         this.alwaysUpdate = true;
 
-        this.textSettings = {
-            font: "16px Arial",
-            fillStyle: "#FFF",
-            textAlign: "left"
-        };
+        this.scale(3)
 
-        // Crie um Text por slot
-        this.texts = [];
-        for (let i = 0; i < 3; i++) {
-            let text = new me.Text(0, 0, this.textSettings);
-            text.setText("");
-            this.texts.push(text);
-        }
-        // Controle para não recriar desnecessariamente
-        this._lastLabels = ["", "", ""];
+        if (isActive) this.drawWeapon(x, y)
     }
 
+    drawWeapon(x, y) {
+        const sprite = new me.UISpriteElement(x, y, {
+            image: this.weaponType
+        });
+        sprite.scale(3)
+        this.parent.addChild(sprite, 100);
+    }
+
+    drawHighlight() {
+        this.isHighlighted = true;
+    }
+
+
     draw(renderer) {
-        for (let i = 0; i < this.player.weapons.length; i++) {
-            let x = this.pos.x + i * 48;
-            let y = this.pos.y;
-            renderer.setColor("#222");
-            renderer.fillRect(x, y, 40, 40);
+        super.draw(renderer);
 
-
-            if (this.player.currentWeapon?.currentType === this.player.weapons[i]) {
-                renderer.setColor("#FFD700");
-                renderer.strokeRect(x, y, 40, 40);
-            }
-
-            let label = this.player.weapons[i] ? this.player.weapons[i].currentType : "vazio";
-
-            if (this._lastLabels[i] !== label) {
-                this.texts[i].setText(label);
-                this._lastLabels[i] = label;
-            }
-            this.texts[i].draw(renderer, x + 5, y + 28);
+        if (this.player.currentWeapon?.currentType === this.weaponType) {
+            renderer.setColor("yellow");
+            renderer.strokeRect(this.pos.x, this.pos.y, this.width, this.height);
         }
     }
 }
