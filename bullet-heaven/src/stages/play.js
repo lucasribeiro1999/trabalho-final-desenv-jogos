@@ -51,14 +51,21 @@ class PlayScreen extends me.Stage {
             me.loader.getJSON("player"),
             me.loader.getImage("player")
         );
-        this.player = new PlayerEntity();
-        me.game.world.addChild(this.player, 1);
 
-        // HUD das armas
-        me.game.world.addChild(new WeaponHudContainer(this.player), 99);
+        const player = new PlayerEntity();
+        me.game.world.addChild(player, 1);
+
+        GameData.player = player
+        if (GameData.savedPlayerPos) {
+            GameData.player.pos.x = GameData.savedPlayerPos.x;
+            GameData.player.pos.y = GameData.savedPlayerPos.y;
+        }
+
+        // HUD das armas: sempre visível sobre o jogo
+        this.weaponSlotsHud = new WeaponHudContainer(GameData.player)
+        me.game.world.addChild(this.weaponSlotsHud, 99);
 
         this.enemyManager = new EnemyManager();
-        this.enemyManager.createEnemies();
         me.game.world.addChild(this.enemyManager, 2);
 
         // HUD de XP / níveis
@@ -143,7 +150,7 @@ class PlayScreen extends me.Stage {
     }
 
     checkIfLoss(y) {
-        if (y >= this.player.pos.y) {
+        if (y >= GameData.player.pos.y) {
             this.reset();
         }
     }
