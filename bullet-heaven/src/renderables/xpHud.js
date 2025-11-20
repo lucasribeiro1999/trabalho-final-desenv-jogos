@@ -9,7 +9,7 @@ class XPHUD extends me.Container {
         this.alwaysUpdate = true;
 
         this.coinIcon = new me.UISpriteElement(18, 18, {
-            image: me.loader.getImage("gold-coin")
+            image: me.loader.getImage("mana")
         });
         this.addChild(this.coinIcon);
 

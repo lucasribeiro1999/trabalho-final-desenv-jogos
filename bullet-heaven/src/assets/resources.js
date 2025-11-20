@@ -22,7 +22,7 @@ export let GAME_RESOURCES = [
     { name: "empty-heart", type: "image", src: "src/assets/health/empty-heart.png" },
     { name: "heart", type: "image", src: "src/assets/health/heart.png" },
     { name: "cell", type: "image", src: "src/assets/ui/cell.png" },
-    { name: "gold-coin", type: "image", src: "src/assets/ui/gold-coin.png" },
+    { name: "mana", type: "image", src: "src/assets/ui/mana.png" },
     { name: "button-not-pressed", type: "image", src: "src/assets/ui/button-not-pressed.png" },
     { name: "rifle", type: "image", src: "src/assets/weapons/rifle.png" },
     { name: "pistol", type: "image", src: "src/assets/weapons/pistol.png" },
