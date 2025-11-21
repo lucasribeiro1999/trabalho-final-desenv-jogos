@@ -20,12 +20,12 @@ class XPHUD extends me.Container {
             textAlign: "left",
             textBaseline: "top",
         });
+        this.addChild(this.xpText);
 
         this.floating = true;
         this.alwaysUpdate = true;
 
         this.lastText = "";
-        this.setText(this.formatText());
     }
 
     formatText() {
