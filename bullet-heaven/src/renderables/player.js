@@ -201,6 +201,19 @@ class PlayerEntity extends me.Entity {
         return true;
     }
 
+    healDamage() {
+        const healthSystem = GameData.healthSystem
+
+        if (this.currentHealth >= healthSystem.maxHeartCount) {
+            return
+        }
+
+        this.currentHealth += 1
+
+        healthSystem.updateHealth(this.currentHealth);
+    }
+
+
     takeDamage() {
         if (this.currentState === PlayerState.COLLIDING) {
             if (this.currentHealth <= 0) {
@@ -208,10 +221,8 @@ class PlayerEntity extends me.Entity {
                 this.startDeath();
             } else {
                 this.currentHealth -= 1
-                const currentScreen = me.state.current()
-                if (currentScreen instanceof PlayScreen) {
-                    currentScreen.healthSystem.updateHealth(this.currentHealth);
-                }
+
+                GameData.healthSystem.updateHealth(this.currentHealth);
             }
         }
     }

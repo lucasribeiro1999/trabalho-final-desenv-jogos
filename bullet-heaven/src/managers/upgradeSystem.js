@@ -10,17 +10,24 @@ import { Upgrade } from '../domain/models/upgrade';
 const UPGRADES = [CONSTANTS.UPGRADES.HEAL, CONSTANTS.UPGRADES.LUCK_INCREASE, CONSTANTS.UPGRADES.MORE_MAX_HEALTH, CONSTANTS.UPGRADES.MOVE_SPEED_INCREASE, CONSTANTS.UPGRADES.XP_DROP_INCREASE]
 
 function storeUpgradeToGameData(id) {
-    if (!GameData.activeUpgrades.has(id)) GameData.activeUpgrades.set(id, new Upgrade(id, 0))
+    if (id === CONSTANTS.UPGRADES.HEAL) {
+        GameData.player.healDamage();
 
-    const upgrade = GameData.activeUpgrades.get(id)
+    } else {
+        if (!GameData.activeUpgrades.has(id)) GameData.activeUpgrades.set(id, new Upgrade(id, 0))
 
-    upgrade.buyNewLevel()
+        const upgrade = GameData.activeUpgrades.get(id)
+
+        upgrade.buyNewLevel()
+    }
 
     me.state.change(me.state.PLAY, () => {
-        me.game.world.children.forEach(child => {
-            if (child instanceof me.UISpriteElement) {
-                me.game.world.removeChild(child);
+        this.children?.forEach(child => {
+            if (child instanceof UpgradeCard) {
+                this.removeChild(child);
             }
+
+            GameData.healthSystem.renderHearts()
         });
     });
 }
@@ -45,7 +52,7 @@ export class UpgradeSystem extends me.Container {
     }
 
     renderUpgrades(upgradesToRender) {
-        if (!upgradesToRender?.length === 3) return
+        if (upgradesToRender?.length !== 3) return
 
         const cardWidth = 235
         const cardSpacing = 70
@@ -54,7 +61,7 @@ export class UpgradeSystem extends me.Container {
 
         const middleCardPositionX = me.game.viewport.width / 2
 
-        const middleCard = new UpgradeCard(middleCardPositionX, cardPositionY, upgradesToRender[0], () => storeUpgradeToGameData(upgradesToRender[0]))
+        const middleCard = new UpgradeCard(middleCardPositionX, cardPositionY, CONSTANTS.UPGRADES.MORE_MAX_HEALTH, () => storeUpgradeToGameData(CONSTANTS.UPGRADES.MORE_MAX_HEALTH))
         me.game.world.addChild(middleCard);
 
         const leftCardPositionX = middleCardPositionX - (cardWidth) - cardSpacing

@@ -72,8 +72,8 @@ class PlayScreen extends me.Stage {
         this.xpHud = new XPHUD();
         me.game.world.addChild(this.xpHud, 9999);
 
-        this.healthSystem = new HealthSystem();
-        me.game.world.addChild(this.healthSystem, 9999);
+        GameData.healthSystem = new HealthSystem();
+        me.game.world.addChild(GameData.healthSystem, 9999);
 
         me.input.bindKey(me.input.KEY.LEFT, "left");
         me.input.bindKey(me.input.KEY.A, "left");
