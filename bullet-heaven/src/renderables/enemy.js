@@ -1,4 +1,5 @@
 import * as me from "melonjs";
+import PlayScreen from "../stages/play.js";
 import PlayerEntity from "./player.js";
 import CONSTANTS, { WEAPON_DROP_RARITIES } from "../constants.js";
 import { GameData } from "../gameData.js";
@@ -39,7 +40,6 @@ class EnemyEntity extends me.Sprite {
             framewidth: 13,
             frameheight: 18,
         });
-
         this.body = new me.Body(this);
         this.body.addShape(new me.Rect(0, 0, this.width, this.height));
         this.body.collisionType = me.collision.types.ENEMY_OBJECT;
@@ -77,7 +77,7 @@ class EnemyEntity extends me.Sprite {
         this.isDying = true;
         if (this.body.setCollisionMask) this.body.setCollisionMask(0);
 
-        // >>> GANHO DE XP AO MATAR ZUMBI <<<
+        // GANHO DE XP AO MATAR ZUMBI
         GameData.xp += CONSTANTS.XP.PER_ZOMBIE;
         console.log("XP atual:", GameData.xp);
 
@@ -129,6 +129,9 @@ class EnemyEntity extends me.Sprite {
     }
 
     update(dt) {
+        // PAUSA TOTAL
+        if (PlayScreen.isPaused) return false;
+
         super.update(dt);
 
         const prevX = this.pos.x;

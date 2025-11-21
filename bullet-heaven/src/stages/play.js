@@ -1,16 +1,19 @@
 // src/stages/play.js
 import * as me from 'melonjs';
-
 import { GameData } from "../gameData.js";
-
 import XPHUD from "../renderables/xpHud.js";
 import PlayerEntity from "../renderables/player.js";
 import WeaponHudContainer from "../renderables/ui/weaponHudContainer.js";
-
 import EnemyManager from "../managers/enemy-manager.js";
 import { HealthSystem } from '../managers/healthSystem.js';
+import PausedText from "../renderables/ui/pausedText.js";
 
 class PlayScreen extends me.Stage {
+    static isPaused = false;
+    paused = false;
+    pauseTextRenderable = null;
+    _pauseKeyPressed = false;
+
     onResetEvent() {
         // sempre que começar/der reset na fase, zera o XP e os níveis
         GameData.xp = 0;
@@ -22,10 +25,8 @@ class PlayScreen extends me.Stage {
         const bgImage = me.loader.getImage("map-01");
         if (bgImage) {
             const bg = new me.Renderable(
-                0,
-                0,
-                me.game.viewport.width,
-                me.game.viewport.height
+                0, 0,
+                me.game.viewport.width, me.game.viewport.height
             );
             bg.draw = function (renderer) {
                 if (bgImage.width > 0 && bgImage.height > 0) {
@@ -38,15 +39,14 @@ class PlayScreen extends me.Stage {
                     const offsetY = me.game.viewport.height / 2;
                     renderer.drawImage(
                         bgImage,
-                        offsetX,
-                        offsetY,
-                        scaledWidth,
-                        scaledHeight
+                        offsetX, offsetY,
+                        scaledWidth, scaledHeight
                     );
                 }
             };
             me.game.world.addChild(bg, 0);
         }
+
         me.game.playerAtlas = new me.TextureAtlas(
             me.loader.getJSON("player"),
             me.loader.getImage("player")
@@ -81,6 +81,44 @@ class PlayScreen extends me.Stage {
         me.input.bindKey(me.input.KEY.NUM1, "one");
         me.input.bindKey(me.input.KEY.NUM2, "two");
         me.input.bindKey(me.input.KEY.NUM3, "three");
+        me.input.bindKey(me.input.KEY.P, "pause");
+    }
+
+    update(dt) {
+        // Controle de pause/despause
+        if (me.input.isKeyPressed("pause") && !this._pauseKeyPressed) {
+            this._pauseKeyPressed = true;
+            if (!this.paused) {
+                this.paused = true;
+                PlayScreen.isPaused = true;
+                if (!this.pauseTextRenderable) {
+                    this.pauseTextRenderable = new PausedText();
+                    me.game.world.addChild(this.pauseTextRenderable, 99999);
+                }
+            } else {
+                this.paused = false;
+                PlayScreen.isPaused = false;
+                if (this.pauseTextRenderable) {
+                    me.game.world.removeChild(this.pauseTextRenderable);
+                    this.pauseTextRenderable = null;
+                }
+            }
+        }
+        if (!me.input.isKeyPressed("pause")) {
+            this._pauseKeyPressed = false;
+        }
+
+        if (this.paused) {
+            return true;
+        }
+
+        if (this.player?.currentHealth <= 0) {
+            setTimeout(() => {
+                me.state.change(me.state.GAMEOVER);
+            }, 1000);
+        }
+
+        return true;
     }
 
     onDestroyEvent() {
@@ -93,10 +131,15 @@ class PlayScreen extends me.Stage {
         me.input.unbindKey(me.input.KEY.DOWN);
         me.input.unbindKey(me.input.KEY.S);
         me.input.unbindKey(me.input.KEY.SPACE);
-
         me.input.unbindKey(me.input.KEY.NUM1);
         me.input.unbindKey(me.input.KEY.NUM2);
         me.input.unbindKey(me.input.KEY.NUM3);
+        me.input.unbindKey(me.input.KEY.P);
+
+        if (this.pauseTextRenderable) {
+            me.game.world.removeChild(this.pauseTextRenderable);
+            this.pauseTextRenderable = null;
+        }
     }
 
     checkIfLoss(y) {

@@ -13,7 +13,6 @@ const PlayerState = {
 
 class PlayerEntity extends me.Entity {
     currentState = PlayerState.IDLE;
-
     static maxHealth = CONSTANTS.PLAYER.MAX_HEALTH;
     currentHealth = 5;
 
@@ -123,6 +122,9 @@ class PlayerEntity extends me.Entity {
     }
 
     update(dt) {
+        // PAUSA TOTAL
+        if (PlayScreen.isPaused) return false;
+
         super.update(dt);
 
         const prevX = this.pos.x;
