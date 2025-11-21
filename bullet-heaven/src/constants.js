@@ -33,7 +33,14 @@ const defines = {
             }
         }
     },
-    ENEMY: { BASE_HEALTH: 5 }
+    ENEMY: { BASE_HEALTH: 5 },
+    UPGRADES: {
+        HEAL: "heal",
+        LUCK_INCREASE: "luck-increase",
+        MORE_MAX_HEALTH: "more-max-health",
+        MOVE_SPEED_INCREASE: "move-speed-increase",
+        XP_DROP_INCREASE: "xp-drop-increase",
+    }
 };
 
 const WEAPON_DROP_RARITIES = [

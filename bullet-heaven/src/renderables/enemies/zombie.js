@@ -1,10 +1,14 @@
 import * as me from "melonjs";
-import PlayScreen from "../stages/play.js";
-import PlayerEntity from "./player.js";
-import CONSTANTS, { WEAPON_DROP_RARITIES } from "../constants.js";
-import { GameData } from "../gameData.js";
-import { recalculateWeaponLevelsFromXP } from "./utils/xpUtils.js";
-import WeaponDropEntity from "./weaponDropEntity.js";
+
+import PlayScreen from "../../stages/play.js";
+
+import PlayerEntity from "../player.js";
+import WeaponDropEntity from "../weaponDropEntity.js";
+
+import { recalculateWeaponLevelsFromXP } from "../utils/xpUtils.js";
+
+import { GameData } from "../../gameData.js";
+import CONSTANTS, { WEAPON_DROP_RARITIES } from "../../constants.js";
 
 function tryDropWeapon(posX, posY) {
     if (Math.random() < 0.10) { // 10% chance de drop
@@ -18,66 +22,71 @@ function tryDropWeapon(posX, posY) {
                 break;
             }
         }
+
         const weaponTypes = ["pistol", "rifle", "shotgun"];
         const type = weaponTypes[Math.floor(Math.random() * weaponTypes.length)];
         const level = r.minLevel === r.maxLevel
             ? r.maxLevel
             : r.minLevel + Math.floor(Math.random() * (r.maxLevel - r.minLevel + 1));
+
         me.game.world.addChild(
             new WeaponDropEntity(posX, posY, type, level, r.type),
             5
         );
     }
 }
-
-class EnemyEntity extends me.Sprite {
-    attackCooldown = 1000;
-    lastAttackTime = 0;
-
-    constructor(x, y) {
+export class Zombie extends me.Sprite {
+    constructor(x, y, image, frameWidth, frameHeight, initialHealth = 1, level = 1, baseAttackCooldown = 1000) {
         super(x, y, {
-            image: "zombie-axe-idle",
-            framewidth: 13,
-            frameheight: 18,
+            image,
+            framewidth: frameWidth,
+            frameheight: frameHeight,
         });
+
         this.body = new me.Body(this);
         this.body.addShape(new me.Rect(0, 0, this.width, this.height));
         this.body.collisionType = me.collision.types.ENEMY_OBJECT;
         this.body.ignoreGravity = true;
 
-        if (this.body.setStatic) this.body.setStatic(true);
-        this.body.vel.set(0, 0);
-        this.body.force.set(0, 0);
-        if (this.body.setMaxVelocity) this.body.setMaxVelocity(0, 0);
-        if (this.body.setCollisionMask) {
-            this.body.setCollisionMask(
-                me.collision.types.PLAYER_OBJECT |
-                me.collision.types.PROJECTILE_OBJECT
-            );
-        }
+        this.level = level;
 
-        this.addAnimation("idle", [0, 1, 2, 3], 350);
-        this.setCurrentAnimation("idle");
-        this.scale(CONSTANTS.SPRITE.SCALE_UP);
-        this.speed = 80;
+        this.baseAttack = 5;
+        this.baseSpeed = 80;
         this.isDying = false;
+
         this.health = CONSTANTS.ENEMY.BASE_HEALTH;
+
+        this.health = initialHealth;
+        this.attackDamage = this.calculateAttack();
+        this.speed = this.calculateSpeed();
+
+        this.attackCooldown = baseAttackCooldown;
+        this.lastAttackTime = 0;
+
+        this.damageCooldown = 1000;
+        this.lastTimeAttacked = 0;
+
+        this.isDying = false;
+
+        this.#_setupAnimation()
+        this.#_setupZombieBody()
     }
 
-    takeDamage(amount = 1) {
-        if (this.isDying) return;
-        this.health -= amount;
-        if (this.health <= 0) {
-            this.startDeath();
-        }
+    calculateAttack() {
+        return this.baseAttack + (this.level - 1) * 2; // +2 dmg per level
     }
 
-    startDeath() {
+    calculateSpeed() {
+        return this.baseSpeed + (this.level - 1) * 5; // +5 speed per level
+    }
+
+    startDeath(image, frameWidth, frameHeight, animationSprites) {
         if (this.isDying) return;
+
         this.isDying = true;
+
         if (this.body.setCollisionMask) this.body.setCollisionMask(0);
 
-        // GANHO DE XP AO MATAR ZUMBI
         GameData.xp += CONSTANTS.XP.PER_ZOMBIE;
         console.log("XP atual:", GameData.xp);
 
@@ -90,27 +99,46 @@ class EnemyEntity extends me.Sprite {
         // Efeito visual de morte
         const parent = this.ancestor || me.game.world;
         const deathSprite = new me.Sprite(this.pos.x, this.pos.y, {
-            image: me.loader.getImage("zombie-axe-death"),
-            framewidth: 27,
-            frameheight: 18,
+            image: image,
+            framewidth: frameWidth,
+            frameheight: frameHeight,
         });
-        deathSprite.addAnimation("death", [0, 1, 2, 3, 4, 5], 100);
+        deathSprite.addAnimation("death", animationSprites, 100);
         deathSprite.setCurrentAnimation("death", () => {
             parent.removeChild(deathSprite);
         });
         deathSprite.scale(CONSTANTS.SPRITE.SCALE_UP);
-        parent.addChild(deathSprite, typeof this.z === "number" ? this.z : 2);
 
-        if (parent) parent.removeChild(this);
+        parent?.addChild(deathSprite, typeof this.z === "number" ? this.z : 2);
+        parent?.removeChild(this);
     }
+
+    takeDamage(amount = 1) {
+        if (this.isDying) return;
+
+        this.health -= amount;
+        if (this.health <= 0) {
+            this.startDeath();
+        }
+    }
+
 
     onCollision(response, other) {
         if (other.body.collisionType === me.collision.types.PROJECTILE_OBJECT) {
-            const dmg = typeof other.damage === "number" ? other.damage : 1;
-            this.takeDamage(dmg);
-            me.game.world.removeChild(other);
+            const now = me.timer.getTime();
+
+            if (now - this.lastTimeAttacked > this.damageCooldown) {
+                const dmg = typeof other.damage === "number" ? other.damage : 1;
+
+                this.takeDamage(dmg);
+
+                this.lastTimeAttacked = now;
+
+                me.game.world.removeChild(other);
+            }
             return false;
         }
+
         if (other.body.collisionType === me.collision.types.PLAYER_OBJECT) {
             if (
                 typeof this._lastValidX === "number" &&
@@ -159,6 +187,31 @@ class EnemyEntity extends me.Sprite {
         this._lastValidY = prevY;
         return true;
     }
-}
 
-export default EnemyEntity;
+
+    #_setupAnimation() {
+        this.addAnimation("idle", [0, 1, 2, 3, 4, 5], 350);
+        this.setCurrentAnimation("idle");
+
+        this.scale(CONSTANTS.SPRITE.SCALE_UP);
+    }
+
+    #_setupZombieBody() {
+        this.body = new me.Body(this);
+        this.body.addShape(new me.Rect(0, 0, this.width, this.height));
+        this.body.collisionType = me.collision.types.ENEMY_OBJECT;
+        this.body.ignoreGravity = true;
+
+        if (this.body.setStatic) this.body.setStatic(true);
+        this.body.vel.set(0, 0);
+        this.body.force.set(0, 0);
+        if (this.body.setMaxVelocity) this.body.setMaxVelocity(0, 0);
+        if (this.body.setCollisionMask) {
+            this.body.setCollisionMask(
+                me.collision.types.PLAYER_OBJECT |
+                me.collision.types.PROJECTILE_OBJECT
+            );
+        }
+
+    }
+}

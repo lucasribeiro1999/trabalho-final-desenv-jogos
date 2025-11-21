@@ -35,8 +35,8 @@ class PlayerEntity extends me.Entity {
         this.body.collisionType = me.collision.types.PLAYER_OBJECT;
         this.body.ignoreGravity = true;
 
-        this.vely = 450;
-        this.velx = 450;
+        this.baseVelocity = 350;
+
         this.margin = 32;
         this.minX = this.margin;
         this.maxX = me.game.viewport.width - this.width - this.margin;
@@ -49,7 +49,6 @@ class PlayerEntity extends me.Entity {
 
         this.setupAnimations();
 
-        // Armas no inventário. Inicialmente só pistola. Permite upgrade/desbloqueio por drop.
         this.weapons = [
             CONSTANTS.WEAPONS.PISTOL.NAME,
             CONSTANTS.WEAPONS.RIFLE.NAME,
@@ -63,6 +62,13 @@ class PlayerEntity extends me.Entity {
         this.currentWeaponSlot = 0;
         this.currentWeapon = new WeaponEntity(this, this.weapons[this.currentWeaponSlot]);
         me.game.world.addChild(this.currentWeapon, 3);
+    }
+
+    get velocity() {
+        const velocityUpgrade = GameData.activeUpgrades.get(CONSTANTS.UPGRADES.MOVE_SPEED_INCREASE)
+        const upgradeLevel = velocityUpgrade?.level ?? 0
+
+        return this.baseVelocity + 32 * upgradeLevel;
     }
 
     switchWeapon(slot) {
@@ -136,28 +142,28 @@ class PlayerEntity extends me.Entity {
         this.currentState = PlayerState.IDLE;
 
         if (me.input.isKeyPressed("left")) {
-            this.pos.x -= this.velx * dt / 1000;
+            this.pos.x -= this.velocity * dt / 1000;
             this.facing = 'left';
             this.currentState = PlayerState.MOVING
             this.switchToDirection('left');
             this.isMoving = true;
         }
         if (me.input.isKeyPressed("right")) {
-            this.pos.x += this.velx * dt / 1000;
+            this.pos.x += this.velocity * dt / 1000;
             this.facing = 'right';
             this.currentState = PlayerState.MOVING
             this.switchToDirection('right');
             this.isMoving = true;
         }
         if (me.input.isKeyPressed("up")) {
-            this.pos.y -= this.vely * dt / 1000;
+            this.pos.y -= this.velocity * dt / 1000;
             this.facing = 'up';
             this.currentState = PlayerState.MOVING
             this.switchToDirection('up');
             this.isMoving = true;
         }
         if (me.input.isKeyPressed("down")) {
-            this.pos.y += this.vely * dt / 1000;
+            this.pos.y += this.velocity * dt / 1000;
             this.facing = 'down';
             this.currentState = PlayerState.MOVING
             this.switchToDirection('down');
@@ -195,6 +201,19 @@ class PlayerEntity extends me.Entity {
         return true;
     }
 
+    healDamage() {
+        const healthSystem = GameData.healthSystem
+
+        if (this.currentHealth >= healthSystem.maxHeartCount) {
+            return
+        }
+
+        this.currentHealth += 1
+
+        healthSystem.updateHealth(this.currentHealth);
+    }
+
+
     takeDamage() {
         if (this.currentState === PlayerState.COLLIDING) {
             if (this.currentHealth <= 0) {
@@ -202,10 +221,8 @@ class PlayerEntity extends me.Entity {
                 this.startDeath();
             } else {
                 this.currentHealth -= 1
-                const currentScreen = me.state.current()
-                if (currentScreen instanceof PlayScreen) {
-                    currentScreen.healthSystem.updateHealth(this.currentHealth);
-                }
+
+                GameData.healthSystem.updateHealth(this.currentHealth);
             }
         }
     }

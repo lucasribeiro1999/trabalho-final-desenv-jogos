@@ -3,6 +3,7 @@ import * as me from 'melonjs';
 import { HealtPoint } from '../renderables/ui/healthPoint';
 
 import CONSTANTS from '../constants.js';
+import { GameData } from '../gameData.js';
 
 export class HealthSystem extends me.Container {
     constructor() {
@@ -11,27 +12,42 @@ export class HealthSystem extends me.Container {
         this.isPersistent = true;
         this.floating = true;
 
-        this.hearts = [];
+        me.event.on(me.event.STATE_CHANGE, () => {
+            this.renderHearts()
+        })
+    }
 
-        let heartCount = CONSTANTS.PLAYER.MAX_HEALTH;
-        let heartSpacing = 64;
-        let heartWidth = 32;
+    get maxHeartCount() {
+        const maxHealthUpgrade = GameData.activeUpgrades.get(CONSTANTS.UPGRADES.MORE_MAX_HEALTH)
+        const upgradeLevel = maxHealthUpgrade?.level ?? 0
 
-        let rowWidth = heartCount * heartWidth + (heartCount - 1) * (heartSpacing - heartWidth);
+        return CONSTANTS.PLAYER.MAX_HEALTH + upgradeLevel;
+    }
 
-        let startX = (this.width - rowWidth) / 2;
+    renderHearts() {
+        this.hearts?.forEach(heart => this.removeChild(heart))
+        this.hearts = []
 
-        for (let i = 0; i < heartCount; i++) {
-            let heart = new HealtPoint(startX + i * heartSpacing, (this.height - heartWidth) / 2);
+        const heartSpacing = 64;
+        const heartWidth = 32;
+        const padding = 16
+
+        const rightX = this.width - heartWidth - padding;
+
+        for (let i = 0; i < this.maxHeartCount; i++) {
+            const x = rightX - i * heartSpacing;
+            const y = (this.height - heartWidth) / 2;
+
+            const heart = new HealtPoint(x, y);
             this.addChild(heart);
             this.hearts.push(heart);
         }
     }
 
     updateHealth(currentHealth) {
-        let missingHealth = CONSTANTS.PLAYER.MAX_HEALTH - currentHealth
+        let missingHealth = this.maxHeartCount - currentHealth
 
-        for (let i = 0; i < this.hearts.length; i++) {
+        for (let i = this.hearts.length - 1; i >= 0; i--) {
             if (missingHealth > 0) {
                 this.hearts[i].takeDamage();
                 missingHealth--;
@@ -39,5 +55,10 @@ export class HealthSystem extends me.Container {
                 this.hearts[i].healDamage();
             }
         }
+    }
+
+
+    onActivateEvent() {
+        this.renderHearts();
     }
 }
