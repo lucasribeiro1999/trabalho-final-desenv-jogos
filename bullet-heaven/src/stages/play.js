@@ -1,7 +1,7 @@
 // src/stages/play.js
 import * as me from 'melonjs';
 import { GameData } from "../gameData.js";
-import XPHUD from "../renderables/xpHud.js";
+import XPHUD from "../renderables/ui/xpHud.js";
 import PlayerEntity from "../renderables/player.js";
 import WeaponHudContainer from "../renderables/ui/weaponHudContainer.js";
 import EnemyManager from "../managers/enemy-manager.js";

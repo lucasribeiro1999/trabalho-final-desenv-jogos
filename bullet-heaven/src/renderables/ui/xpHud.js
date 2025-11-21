@@ -1,5 +1,5 @@
 import * as me from "melonjs";
-import { GameData } from "../gameData.js";
+import { GameData } from "../../gameData.js";
 
 class XPHUD extends me.Container {
     constructor() {
