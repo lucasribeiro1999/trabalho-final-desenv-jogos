@@ -1,12 +1,6 @@
 import * as me from "melonjs";
 
-import CONSTANTS from "../../constants"
-
-const sprites = {
-    [CONSTANTS.WEAPONS.RIFLE.NAME]: me.loader.getImage("rifle"),
-    [CONSTANTS.WEAPONS.PISTOL.NAME]: me.loader.getImage("pistol"),
-    [CONSTANTS.WEAPONS.SHOTGUN.NAME]: me.loader.getImage("shotgun")
-}
+import { GameData } from "../../gameData";
 
 class WeaponHud extends me.UISpriteElement {
     constructor(x, y, player, weaponType, parent, isActive) {
@@ -38,6 +32,20 @@ class WeaponHud extends me.UISpriteElement {
         });
         sprite.scale(3)
         this.parent.addChild(sprite, 100);
+
+        console.log(GameData.weaponLevels);
+
+        const thisWeaponLevel = GameData.weaponLevels[this.weaponType]
+        const xpText = new me.Text(x + 10, y + 6, {
+            font: "sans-serif",
+            size: 25,
+            fillStyle: "#ffffff",
+            textAlign: "left",
+            textBaseline: "top",
+            strokeStyle: "#000"
+        });
+        xpText.setText(thisWeaponLevel)
+        this.parent.addChild(xpText, 101);
     }
 
     drawHighlight() {
