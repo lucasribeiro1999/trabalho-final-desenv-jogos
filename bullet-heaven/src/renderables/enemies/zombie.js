@@ -22,11 +22,13 @@ function tryDropWeapon(posX, posY) {
                 break;
             }
         }
+
         const weaponTypes = ["pistol", "rifle", "shotgun"];
         const type = weaponTypes[Math.floor(Math.random() * weaponTypes.length)];
         const level = r.minLevel === r.maxLevel
             ? r.maxLevel
             : r.minLevel + Math.floor(Math.random() * (r.maxLevel - r.minLevel + 1));
+
         me.game.world.addChild(
             new WeaponDropEntity(posX, posY, type, level, r.type),
             5
