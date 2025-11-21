@@ -47,7 +47,7 @@ export class HealthSystem extends me.Container {
     updateHealth(currentHealth) {
         let missingHealth = this.maxHeartCount - currentHealth
 
-        for (let i = 0; i < this.hearts.length; i++) {
+        for (let i = this.hearts.length - 1; i >= 0; i--) {
             if (missingHealth > 0) {
                 this.hearts[i].takeDamage();
                 missingHealth--;
