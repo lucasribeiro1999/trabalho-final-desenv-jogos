@@ -61,7 +61,7 @@ export class UpgradeSystem extends me.Container {
 
         const middleCardPositionX = me.game.viewport.width / 2
 
-        const middleCard = new UpgradeCard(middleCardPositionX, cardPositionY, CONSTANTS.UPGRADES.MORE_MAX_HEALTH, () => storeUpgradeToGameData(CONSTANTS.UPGRADES.MORE_MAX_HEALTH))
+        const middleCard = new UpgradeCard(middleCardPositionX, cardPositionY, upgradesToRender[0], () => storeUpgradeToGameData(upgradesToRender[0]))
         me.game.world.addChild(middleCard);
 
         const leftCardPositionX = middleCardPositionX - (cardWidth) - cardSpacing

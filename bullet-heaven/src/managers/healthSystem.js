@@ -30,13 +30,15 @@ export class HealthSystem extends me.Container {
 
         const heartSpacing = 64;
         const heartWidth = 32;
+        const padding = 16
 
-        const rowWidth = this.maxHeartCount * heartWidth + (this.maxHeartCount - 1) * (heartSpacing - heartWidth);
-
-        const startX = (this.width - rowWidth) / 2;
+        const rightX = this.width - heartWidth - padding;
 
         for (let i = 0; i < this.maxHeartCount; i++) {
-            const heart = new HealtPoint(startX + i * heartSpacing, (this.height - heartWidth) / 2);
+            const x = rightX - i * heartSpacing;
+            const y = (this.height - heartWidth) / 2;
+
+            const heart = new HealtPoint(x, y);
             this.addChild(heart);
             this.hearts.push(heart);
         }
