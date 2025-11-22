@@ -36,7 +36,7 @@ class EnemyManager extends me.Container {
             }
         }
 
-        me.event.on(me.event.STATE_CHANGE, (newState, oldState) => {
+        this.handler = me.event.on(me.event.STATE_CHANGE, (newState, oldState) => {
             if (newState === me.state.PLAY) {
                 this.onActivateEvent();
             }
@@ -44,6 +44,8 @@ class EnemyManager extends me.Container {
     }
 
     startUpgradeSelection() {
+        if (GameData.currentHealth <= 0) return;
+
         const player = GameData.player;
 
         if (player?.pos) {
@@ -90,7 +92,9 @@ class EnemyManager extends me.Container {
         this.nextWave();
     }
 
-    onDeactivateEvent() { }
+    onDeactivateEvent() {
+        me.event.off(me.event.STATE_CHANGE, this.handler);
+    }
 }
 
 export default EnemyManager;

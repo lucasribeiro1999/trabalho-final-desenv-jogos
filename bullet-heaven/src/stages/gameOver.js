@@ -1,5 +1,8 @@
 import * as me from 'melonjs';
 
+import { GameData } from '../gameData.js';
+import CONSTANTS from '../constants.js';
+
 class GameOverScreen extends me.Stage {
     onResetEvent() {
         me.game.world.children.length = 0; // Limpa todos os objetos do mundo
@@ -16,8 +19,8 @@ class GameOverScreen extends me.Stage {
                 size: 48,
                 fillStyle: "#FFFFFF",
                 textAlign: "center",
-            },
-            "GAME OVER\nPress ENTER to Restart"
+                text: "GAME OVER\nPress ENTER to Restart"
+            }
         );
         gameOverText.anchorPoint.set(0.5, 0.5);
         me.game.world.addChild(gameOverText);
@@ -29,6 +32,8 @@ class GameOverScreen extends me.Stage {
     update() {
         if (me.input.isKeyPressed("enter")) {
             me.input.unbindKey(me.input.KEY.ENTER);
+            GameData.currentWeaponSlot = 0;
+            GameData.currentHealth = CONSTANTS.PLAYER.MAX_HEALTH;
             me.state.change(me.state.PLAY);
         }
         return true;

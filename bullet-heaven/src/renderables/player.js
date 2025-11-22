@@ -14,7 +14,7 @@ const PlayerState = {
 class PlayerEntity extends me.Entity {
     currentState = PlayerState.IDLE;
     static maxHealth = CONSTANTS.PLAYER.MAX_HEALTH;
-    currentHealth = 5;
+    currentHealth = GameData.currentHealth ?? CONSTANTS.PLAYER.MAX_HEALTH;
 
     constructor() {
         super(
@@ -59,7 +59,7 @@ class PlayerEntity extends me.Entity {
             rifle: GameData.weaponLevels.rifle ?? 1,
             shotgun: GameData.weaponLevels.shotgun ?? 1
         };
-        this.currentWeaponSlot = 0;
+        this.currentWeaponSlot = GameData.currentWeaponSlot;
         this.currentWeapon = new WeaponEntity(this, this.weapons[this.currentWeaponSlot]);
         me.game.world.addChild(this.currentWeapon, 3);
     }
@@ -86,6 +86,7 @@ class PlayerEntity extends me.Entity {
                 me.game.world.addChild(this.currentWeapon, 3);
             }
             this.currentWeaponSlot = slot;
+            GameData.currentWeaponSlot = slot;
         }
     }
 
@@ -208,7 +209,7 @@ class PlayerEntity extends me.Entity {
             return
         }
 
-        this.currentHealth += 1
+        GameData.currentHealth = this.currentHealth;
 
         healthSystem.updateHealth(this.currentHealth);
     }
@@ -222,6 +223,7 @@ class PlayerEntity extends me.Entity {
             } else {
                 this.currentHealth -= 1
 
+                GameData.currentHealth = this.currentHealth;
                 GameData.healthSystem.updateHealth(this.currentHealth);
             }
         }
@@ -233,7 +235,10 @@ class PlayerEntity extends me.Entity {
         if (this.body.setCollisionMask) this.body.setCollisionMask(0);
         const parent = this.ancestor || me.game.world;
         setTimeout(() => {
-            if (parent) parent.removeChild(this);
+            if (parent) {
+                parent.removeChild(this);
+                me.state.change(me.state.GAMEOVER);
+            }
         }, 1000);
     }
 

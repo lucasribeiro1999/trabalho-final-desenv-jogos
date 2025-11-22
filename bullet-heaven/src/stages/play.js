@@ -119,11 +119,7 @@ class PlayScreen extends me.Stage {
             return true;
         }
 
-        if (this.player?.currentHealth <= 0) {
-            setTimeout(() => {
-                me.state.change(me.state.GAMEOVER);
-            }, 1000);
-        }
+
 
         return true;
     }

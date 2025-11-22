@@ -62,6 +62,8 @@ class WeaponEntity extends me.Renderable {
     }
 
     update(dt) {
+        if (!this.owner || !this.owner.pos) return false;
+
         this.pos.x = this.owner.pos.x;
         this.pos.y = this.owner.pos.y;
 
