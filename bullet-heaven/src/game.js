@@ -16,10 +16,22 @@ export default function onload() {
       renderer: me.video.CANVAS, // <- aqui é o pulo do gato
       scale: "auto",
       scaleMethod: "flex-width",
+      antiAlias: false
     })
   ) {
     alert("Your browser does not support HTML5 canvas.");
     return;
+  }
+
+  const renderer = me.video.renderer;
+  if (renderer.settings.renderer === me.video.CANVAS) {
+    const ctx = renderer.getContext();
+    if (ctx) {
+      ctx.imageSmoothingEnabled = false;
+      ctx.webkitImageSmoothingEnabled = false;
+      ctx.mozImageSmoothingEnabled = false;
+      ctx.msImageSmoothingEnabled = false;
+    }
   }
 
   // Debug (pode tirar se quiser)
