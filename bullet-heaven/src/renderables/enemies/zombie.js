@@ -11,7 +11,11 @@ import { GameData } from "../../gameData.js";
 import CONSTANTS, { WEAPON_DROP_RARITIES } from "../../constants.js";
 
 function tryDropWeapon(posX, posY) {
-    if (Math.random() < 0.10) { // 10% chance de drop
+    const luckUpgrade = GameData.activeUpgrades.get(CONSTANTS.UPGRADES.LUCK_INCREASE);
+    const luckLevel = luckUpgrade?.level ?? 0;
+    const dropChance = 0.10 + (luckLevel * 0.05);
+
+    if (Math.random() < dropChance) {
         let roll = Math.random() * 100;
         let acc = 0;
         let r;
@@ -87,8 +91,11 @@ export class Zombie extends me.Sprite {
 
         if (this.body.setCollisionMask) this.body.setCollisionMask(0);
 
-        GameData.xp += CONSTANTS.XP.PER_ZOMBIE;
-        console.log("XP atual:", GameData.xp);
+        const xpUpgrade = GameData.activeUpgrades.get(CONSTANTS.UPGRADES.XP_DROP_INCREASE);
+        const xpLevel = xpUpgrade?.level ?? 0;
+        const xpMultiplier = 1 + (xpLevel * 0.2);
+
+        GameData.xp += CONSTANTS.XP.PER_ZOMBIE * xpMultiplier;
 
         // Atualiza nível das armas (só pistola, pelo xpUtils.js)
         recalculateWeaponLevelsFromXP();
