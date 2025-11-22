@@ -12,14 +12,20 @@ class WeaponHudContainer extends me.Container {
 
         this.player = player;
 
-        this.isPersistent = true;
+
         this.floating = true;
         this.name = "WeaponHudContainer";
+
+        this.slots = []
 
         this.renderWeaponSlots()
     }
 
     renderWeaponSlots() {
+        for (const slot of this.slots) {
+            this.removeChild(slot)
+        }
+
         for (let i = 0; i < WEAPONS.length; i++) {
             const x = (i * (60 + 20));
             const y = 0;
@@ -27,6 +33,7 @@ class WeaponHudContainer extends me.Container {
             const weaponSlot = new WeaponHud(x, y, this.player, WEAPONS[i], this, true)
 
             this.addChild(weaponSlot);
+            this.slots.push(weaponSlot)
         }
     }
 }

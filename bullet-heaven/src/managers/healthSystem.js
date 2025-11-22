@@ -9,12 +9,7 @@ export class HealthSystem extends me.Container {
     constructor() {
         super(me.game.viewport.width - 320, me.game.viewport.height - 64, 320, 64);
 
-        this.isPersistent = true;
         this.floating = true;
-
-        me.event.on(me.event.STATE_CHANGE, () => {
-            this.renderHearts()
-        })
     }
 
     get maxHeartCount() {
@@ -42,6 +37,8 @@ export class HealthSystem extends me.Container {
             this.addChild(heart);
             this.hearts.push(heart);
         }
+
+        this.updateHealth(GameData.currentHealth ?? CONSTANTS.PLAYER.MAX_HEALTH);
     }
 
     updateHealth(currentHealth) {
