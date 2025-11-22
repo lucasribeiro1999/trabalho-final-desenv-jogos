@@ -1,3 +1,5 @@
+import CONSTANTS from './constants.js';
+
 export const GameData = {
     xp: 0,
     weaponLevels: {
@@ -6,5 +8,7 @@ export const GameData = {
         shotgun: 1
     },
     currentWave: 0,
-    activeUpgrades: new Map()
+    activeUpgrades: new Map(),
+    currentWeaponSlot: 0,
+    currentHealth: CONSTANTS.PLAYER.MAX_HEALTH
 };
