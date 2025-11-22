@@ -11,8 +11,11 @@ const UPGRADES = [CONSTANTS.UPGRADES.HEAL, CONSTANTS.UPGRADES.LUCK_INCREASE, CON
 
 function storeUpgradeToGameData(id) {
     if (id === CONSTANTS.UPGRADES.HEAL) {
-        GameData.player.healDamage();
+        const maxHealthUpgrade = GameData.activeUpgrades.get(CONSTANTS.UPGRADES.MORE_MAX_HEALTH);
+        const maxHealthLevel = maxHealthUpgrade?.level ?? 0;
+        const maxHealth = CONSTANTS.PLAYER.MAX_HEALTH + maxHealthLevel;
 
+        GameData.currentHealth = Math.min(GameData.currentHealth + 1, maxHealth);
     } else {
         if (!GameData.activeUpgrades.has(id)) GameData.activeUpgrades.set(id, new Upgrade(id, 0))
 
