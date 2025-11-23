@@ -1,14 +1,18 @@
-// src/stages/play.js
 import * as me from 'melonjs';
-import { GameData } from "../gameData.js";
-import XPHUD from "../renderables/ui/xpHud.js";
-import PlayerEntity from "../renderables/player.js";
-import WeaponHudContainer from "../renderables/ui/weaponHudContainer.js";
+
 import EnemyManager from "../managers/enemy-manager.js";
 import { HealthSystem } from '../managers/healthSystem.js';
+
+import PlayerEntity from "../renderables/player.js";
+
+import XPHUD from "../renderables/ui/xpHud.js";
+import WaveHUD from "../renderables/ui/waveHud.js";
 import PausedText from "../renderables/ui/pausedText.js";
-import CONSTANTS from "../constants.js";
 import WeaponDropEntity from "../renderables/weaponDropEntity.js";
+import WeaponHudContainer from "../renderables/ui/weaponHudContainer.js";
+
+import CONSTANTS from "../constants.js";
+import { GameData } from "../gameData.js";
 
 class PlayScreen extends me.Stage {
     static isPaused = false;
@@ -118,6 +122,10 @@ class PlayScreen extends me.Stage {
         // sistema de corações (HUD de vida)
         GameData.healthSystem = new HealthSystem();
         me.game.world.addChild(GameData.healthSystem, 9999);
+
+        // Wave indicator
+        this.waveHud = new WaveHUD();
+        me.game.world.addChild(this.waveHud, 9999);
 
         // bindings
         me.input.bindKey(me.input.KEY.LEFT, "left");
