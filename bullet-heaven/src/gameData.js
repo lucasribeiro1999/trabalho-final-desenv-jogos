@@ -7,8 +7,8 @@ export const GameData = {
     // níveis das armas
     weaponLevels: {
         pistol: 1,
-        rifle: 1,
-        shotgun: 1
+        rifle: 0,
+        shotgun: 0
     },
 
     // wave atual
@@ -31,5 +31,8 @@ export const GameData = {
     healthSystem: null,
 
     // flag para saber se é um "novo jogo" (primeira vez ou após GAME OVER)
-    isNewRun: true
+    isNewRun: true,
+
+    // armas dropadas no chão que precisam persistir entre stages
+    droppedWeapons: []
 };

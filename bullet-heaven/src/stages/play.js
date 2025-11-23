@@ -1,13 +1,18 @@
-// src/stages/play.js
 import * as me from 'melonjs';
-import { GameData } from "../gameData.js";
-import XPHUD from "../renderables/ui/xpHud.js";
-import PlayerEntity from "../renderables/player.js";
-import WeaponHudContainer from "../renderables/ui/weaponHudContainer.js";
+
 import EnemyManager from "../managers/enemy-manager.js";
 import { HealthSystem } from '../managers/healthSystem.js';
+
+import PlayerEntity from "../renderables/player.js";
+
+import XPHUD from "../renderables/ui/xpHud.js";
+import WaveHUD from "../renderables/ui/waveHud.js";
 import PausedText from "../renderables/ui/pausedText.js";
+import WeaponDropEntity from "../renderables/weaponDropEntity.js";
+import WeaponHudContainer from "../renderables/ui/weaponHudContainer.js";
+
 import CONSTANTS from "../constants.js";
+import { GameData } from "../gameData.js";
 
 class PlayScreen extends me.Stage {
     static isPaused = false;
@@ -25,42 +30,43 @@ class PlayScreen extends me.Stage {
             GameData.xp = 0;
             GameData.weaponLevels = {
                 pistol: 1,
-                rifle: 1,
-                shotgun: 1
+                rifle: 0,
+                shotgun: 0
             };
             GameData.currentWave = 0;
             GameData.activeUpgrades = new Map();
             GameData.currentWeaponSlot = 0;
             GameData.currentHealth = CONSTANTS.PLAYER.MAX_HEALTH;
             GameData.savedPlayerPos = null;
+            GameData.droppedWeapons = [];
             GameData.isNewRun = false;
         }
 
         me.game.world.backgroundColor.parseCSS("#707B64");
+
+        // Use ImageLayer for proper background handling
+        const bgLayer = new me.ImageLayer(0, 0, {
+            image: "map-01",
+            repeat: "repeat"
+        });
+
+        // Scale to cover the entire viewport
         const bgImage = me.loader.getImage("map-01");
-        if (bgImage) {
-            const bg = new me.Renderable(
-                0, 0,
-                me.game.viewport.width, me.game.viewport.height
-            );
-            bg.draw = function (renderer) {
-                if (bgImage.width > 0 && bgImage.height > 0) {
-                    const scaleX = me.game.viewport.width / bgImage.width;
-                    const scaleY = me.game.viewport.height / bgImage.height;
-                    const scale = Math.min(scaleX, scaleY);
-                    const scaledWidth = bgImage.width * scale;
-                    const scaledHeight = bgImage.height * scale;
-                    const offsetX = me.game.viewport.width / 2;
-                    const offsetY = me.game.viewport.height / 2;
-                    renderer.drawImage(
-                        bgImage,
-                        offsetX, offsetY,
-                        scaledWidth, scaledHeight
-                    );
-                }
-            };
-            me.game.world.addChild(bg, 0);
+        if (bgImage && bgImage.width > 0 && bgImage.height > 0) {
+            const scaleX = me.game.viewport.width / bgImage.width;
+            const scaleY = me.game.viewport.height / bgImage.height;
+            const scale = Math.max(scaleX, scaleY);
+            const scaledWidth = bgImage.width * scale;
+            const scaledHeight = bgImage.height * scale;
+
+            bgLayer.resize(scaledWidth, scaledHeight);
+
+            // Position at top-left to fill screen
+            bgLayer.pos.x = -260;
+            bgLayer.pos.y = -20;
         }
+
+        me.game.world.addChild(bgLayer, 0);
 
         // atlas do player
         me.game.playerAtlas = new me.TextureAtlas(
@@ -78,6 +84,22 @@ class PlayScreen extends me.Stage {
             player.pos.y = GameData.savedPlayerPos.y;
         }
         me.game.world.addChild(player, 1);
+
+        // Restaura armas dropadas se não for um novo jogo
+        if (!GameData.isNewRun && GameData.droppedWeapons && GameData.droppedWeapons.length > 0) {
+            GameData.droppedWeapons.forEach(drop => {
+                const weaponDrop = new WeaponDropEntity(
+                    drop.x,
+                    drop.y,
+                    drop.type,
+                    drop.level,
+                    drop.rarity
+                );
+                me.game.world.addChild(weaponDrop, 10);
+            });
+            // Limpa após restaurar para evitar duplicação se o reset for chamado novamente sem destroy
+            GameData.droppedWeapons = [];
+        }
 
         // HUD das armas — evita duplicar se já existir por algum motivo
         let existingHud = me.game.world.getChildByType(WeaponHudContainer)[0];
@@ -100,6 +122,10 @@ class PlayScreen extends me.Stage {
         // sistema de corações (HUD de vida)
         GameData.healthSystem = new HealthSystem();
         me.game.world.addChild(GameData.healthSystem, 9999);
+
+        // Wave indicator
+        this.waveHud = new WaveHUD();
+        me.game.world.addChild(this.waveHud, 9999);
 
         // bindings
         me.input.bindKey(me.input.KEY.LEFT, "left");
@@ -168,6 +194,19 @@ class PlayScreen extends me.Stage {
             me.game.world.removeChild(this.pauseTextRenderable);
             this.pauseTextRenderable = null;
         }
+
+        // Salva armas dropadas
+        GameData.droppedWeapons = [];
+        const drops = me.game.world.getChildByType(WeaponDropEntity);
+        drops.forEach(drop => {
+            GameData.droppedWeapons.push({
+                x: drop.pos.x,
+                y: drop.pos.y,
+                type: drop.weaponType,
+                level: drop.level,
+                rarity: drop.rarity
+            });
+        });
     }
 
     checkIfLoss(y) {

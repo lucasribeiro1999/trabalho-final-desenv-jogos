@@ -16,13 +16,20 @@ const ENEMY_VARIANTS = {
     big: "ZombieBig",
 };
 
-const WAVES = [
-    { count: 1, composition: { small: 1.0 }, level: 1 },
-    { count: 8, composition: { small: 0.7, axe: 0.3 }, level: 2 },
-    { count: 12, composition: { small: 0.5, axe: 0.3, big: 0.2 }, level: 3 },
-    { count: 15, composition: { axe: 0.5, big: 0.5 }, level: 4 },
-    { count: 20, composition: { axe: 0.3, big: 0.7 }, level: 5 },
-];
+// Wave progression constants
+const WAVE_CONFIG = {
+    // Wave thresholds for introducing new variants
+    AXE_APPEARS_AT: 3,      // Axe zombies appear at wave 3
+    BIG_APPEARS_AT: 6,      // Big zombies appear at wave 6
+
+    // Base counts and growth rates
+    BASE_COUNT: 5,          // Starting enemy count
+    COUNT_GROWTH: 1.3,      // Exponential growth factor for enemy count
+
+    // Level progression
+    BASE_LEVEL: 1,
+    LEVEL_INCREASE_EVERY: 3, // Increase enemy level every N waves
+};
 
 class EnemyManager extends me.Container {
     constructor() {
@@ -55,14 +62,62 @@ class EnemyManager extends me.Container {
         me.state.change(me.state.UPGRADE_SELECTION);
     }
 
-    nextWave() {
-        if (GameData.currentWave >= WAVES.length) {
-            console.log("All waves cleared!");
-            return;
+    /**
+     * Generates wave configuration procedurally based on wave number
+     */
+    generateWave(waveNumber) {
+        // Calculate min and max enemy counts (exponential growth)
+        const baseMin = Math.floor(WAVE_CONFIG.BASE_COUNT * 0.4); // 40% of base
+        const baseMax = WAVE_CONFIG.BASE_COUNT;
+
+        const minCount = Math.floor(baseMin * Math.pow(WAVE_CONFIG.COUNT_GROWTH, waveNumber));
+        const maxCount = Math.floor(baseMax * Math.pow(WAVE_CONFIG.COUNT_GROWTH, waveNumber));
+
+        // Weighted random between min and max (favors maximum)
+        // Using squared random to bias towards higher values
+        const randomFactor = Math.pow(Math.random(), 0.5); // Square root makes it favor max
+        const count = Math.floor(minCount + (maxCount - minCount) * randomFactor);
+
+        // Calculate enemy level
+        const level = WAVE_CONFIG.BASE_LEVEL + Math.floor(waveNumber / WAVE_CONFIG.LEVEL_INCREASE_EVERY);
+
+        // Build composition based on wave number
+        const composition = {};
+
+        if (waveNumber < WAVE_CONFIG.AXE_APPEARS_AT) {
+            // Early waves: only small zombies
+            composition.small = 1.0;
+        } else if (waveNumber < WAVE_CONFIG.BIG_APPEARS_AT) {
+            // Mid waves: small and axe zombies
+            // Axe zombies increase exponentially after introduction
+            const wavesAfterAxe = waveNumber - WAVE_CONFIG.AXE_APPEARS_AT;
+            const axeRatio = Math.min(0.6, 0.2 + (wavesAfterAxe * 0.1));
+            composition.small = 1.0 - axeRatio;
+            composition.axe = axeRatio;
+        } else {
+            // Late waves: all three variants
+            const wavesAfterBig = waveNumber - WAVE_CONFIG.BIG_APPEARS_AT;
+
+            // Big zombies increase exponentially after introduction
+            const bigRatio = Math.min(0.5, 0.15 + (wavesAfterBig * 0.08));
+
+            // Axe zombies continue to increase but slower
+            const axeRatio = Math.min(0.4, 0.3 + (wavesAfterBig * 0.05));
+
+            // Small zombies decrease as others increase
+            const smallRatio = Math.max(0.1, 1.0 - bigRatio - axeRatio);
+
+            composition.small = smallRatio;
+            composition.axe = axeRatio;
+            composition.big = bigRatio;
         }
 
-        const wave = WAVES[GameData.currentWave];
-        console.log(`Starting wave ${GameData.currentWave + 1}`);
+        return { count, minCount, maxCount, composition, level };
+    }
+
+    nextWave() {
+        const wave = this.generateWave(GameData.currentWave);
+        console.log(`Starting wave ${GameData.currentWave + 1}:`, wave);
 
         for (let i = 0; i < wave.count; i++) {
             const x = Math.random() * (me.game.viewport.width - 32) + 16;

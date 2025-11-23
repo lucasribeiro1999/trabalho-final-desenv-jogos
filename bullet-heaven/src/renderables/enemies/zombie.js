@@ -3,7 +3,7 @@ import * as me from "melonjs";
 import PlayScreen from "../../stages/play.js";
 
 import PlayerEntity from "../player.js";
-import { recalculateWeaponLevelsFromXP } from "../utils/xpUtils.js";
+
 
 import { GameData } from "../../gameData.js";
 import CONSTANTS from "../../constants.js";
@@ -84,13 +84,13 @@ export class Zombie extends me.Sprite {
 
         GameData.xp += CONSTANTS.XP.PER_ZOMBIE * xpMultiplier;
 
-        // Atualiza nível das armas (pistola) via XP
-        recalculateWeaponLevelsFromXP();
-
         const luckUpgrade = GameData.activeUpgrades.get(CONSTANTS.UPGRADES.LUCK_INCREASE);
         const luckLevel = luckUpgrade?.level ?? 0;
 
         const dropData = tryCalculateDrop(luckLevel);
+
+        console.log({ dropData });
+
 
         if (dropData) {
             const weaponDropped = new WeaponDropEntity(

@@ -3,11 +3,15 @@ const defines = {
     PLAYER: { MAX_HEALTH: 5 },
     FIRE: { RATE_MS: 1000 },
     SPRITE: { SCALE_UP: 2 },
-    XP: { PER_ZOMBIE: 10 },
+    XP: { PER_ZOMBIE: 10, REROLL_COST: 50 },
     COLORS: {
+        WHITE: "#ebecfa",
         BLUE: "#1f4bc5",
         PURPLE: "#6f20b9",
         ORANGE: "#df4620",
+        GREEN: "#2aee54",
+        YELLOW: "#ffe02f",
+        RED: "#f00c3e",
     },
     LEVEL: {
         XP_PER_LEVEL: 50,

@@ -1,5 +1,12 @@
 import * as me from 'melonjs'
+
 import { UpgradeSystem } from '../managers/upgradeSystem';
+
+import { RerollButton } from '../renderables/ui/rerollButton';
+import XPHUD from '../renderables/ui/xpHud';
+
+import CONSTANTS from '../constants';
+import { GameData } from '../gameData';
 
 me.state.UPGRADE_SELECTION = 0;
 
@@ -7,17 +14,16 @@ export class UpgradeSelectionScreen extends me.Stage {
     onResetEvent() {
         me.game.world.backgroundColor.parseCSS("#17171F");
 
-        // Título principal com fonte Micro 5
         const title = new me.Text(
-            me.game.viewport.width / 2, 
-            80, 
+            me.game.viewport.width / 2,
+            130,
             {
-                text: "Choose your upgrade!",
+                text: "Escolha seu upgrade!",
                 font: "Micro 5",
-                size: 48,
-                fillStyle: "#FFD700",
+                size: 72,
+                fillStyle: CONSTANTS.COLORS.YELLOW,
                 strokeStyle: "#000000",
-                lineWidth: 4,
+                lineWidth: 0,
                 textAlign: "center",
                 textBaseline: "middle"
             }
@@ -25,15 +31,16 @@ export class UpgradeSelectionScreen extends me.Stage {
         title.anchorPoint.set(0.5, 0.5);
         me.game.world.addChild(title);
 
-        // Subtítulo opcional
         const subtitle = new me.Text(
             me.game.viewport.width / 2,
-            140,
+            210,
             {
-                text: "Select one to continue",
+                text: "Escolha um para continuar",
                 font: "Micro 5",
-                size: 20,
-                fillStyle: "#CCCCCC",
+                size: 48,
+                fillStyle: CONSTANTS.COLORS.WHITE,
+                strokeStyle: "#000000",
+                lineWidth: 0,
                 textAlign: "center",
                 textBaseline: "middle"
             }
@@ -41,7 +48,23 @@ export class UpgradeSelectionScreen extends me.Stage {
         subtitle.anchorPoint.set(0.5, 0.5);
         me.game.world.addChild(subtitle);
 
-        const upgradeSystem = new UpgradeSystem()
-        me.game.world.addChild(upgradeSystem, 9999)
+        GameData.upgradeSystem = new UpgradeSystem(450)
+        me.game.world.addChild(GameData.upgradeSystem, 9999)
+
+        // XP HUD
+        const xpHud = new XPHUD();
+        me.game.world.addChild(xpHud, 9999);
+
+        const rerollBtn = new RerollButton(me.game.viewport.width / 2, me.game.viewport.height - 50);
+        me.game.world.addChild(rerollBtn);
+
+        me.input.registerPointerEvent("pointerdown", rerollBtn, () => rerollBtn.onClick());
+        this.rerollBtn = rerollBtn;
+    }
+
+    onDestroyEvent() {
+        if (this.rerollBtn) {
+            me.input.releasePointerEvent("pointerdown", this.rerollBtn);
+        }
     }
 }

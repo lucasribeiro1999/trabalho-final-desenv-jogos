@@ -28,31 +28,37 @@ class WeaponHud extends me.UISpriteElement {
     }
 
     drawWeapon(x, y) {
+        const thisWeaponLevel = GameData.weaponLevels[this.weaponType]
+
+        if (thisWeaponLevel === 0) return;
+
         const sprite = new me.UISpriteElement(x, y, {
             image: this.weaponType
         });
         sprite.scale(3)
         this.parent.addChild(sprite, 100);
 
-        console.log(GameData.weaponLevels);
-
-        const thisWeaponLevel = GameData.weaponLevels[this.weaponType]
-        this.xpText = new me.Text(x + 10, y + 6, {
-            font: "sans-serif",
+        this.xpText = new me.Text(x + 16, y + 1, {
+            font: "Micro 5",
             size: 25,
-            fillStyle: "#ffffff",
+            fillStyle: CONSTANTS.COLORS.WHITE,
+            strokeStyle: "#000000",
+            lineWidth: 0,
             textAlign: "left",
             textBaseline: "top",
-            strokeStyle: "#000"
         });
         this.xpText.setText(thisWeaponLevel)
         this.parent.addChild(this.xpText, 101);
     }
 
     update(dt) {
-        // Update the weapon level text
+        const currentLevel = GameData.weaponLevels[this.weaponType];
+
+        if (currentLevel > 0 && !this.xpText) {
+            this.drawWeapon(this.pos.x, this.pos.y);
+        }
+
         if (this.xpText) {
-            const currentLevel = GameData.weaponLevels[this.weaponType];
             this.xpText.setText(currentLevel);
         }
         return super.update(dt);
@@ -70,9 +76,11 @@ class WeaponHud extends me.UISpriteElement {
             const weaponLevel = GameData.weaponLevels[this.weaponType];
             let strokeColor = "yellow";
 
-            if (weaponLevel === 1) strokeColor = CONSTANTS.COLORS.BLUE;
-            else if (weaponLevel === 2) strokeColor = CONSTANTS.COLORS.PURPLE;
-            else if (weaponLevel >= 3) strokeColor = CONSTANTS.COLORS.ORANGE;
+            if (weaponLevel === 1) strokeColor = CONSTANTS.COLORS.GREEN;
+            else if (weaponLevel === 2) strokeColor = CONSTANTS.COLORS.BLUE;
+            else if (weaponLevel === 3) strokeColor = CONSTANTS.COLORS.PURPLE;
+            else if (weaponLevel === 4) strokeColor = CONSTANTS.COLORS.ORANGE;
+            else if (weaponLevel >= 5) strokeColor = CONSTANTS.COLORS.YELLOW;
 
             renderer.setColor(strokeColor);
             renderer.strokeRect(this.pos.x, this.pos.y, this.width, this.height);

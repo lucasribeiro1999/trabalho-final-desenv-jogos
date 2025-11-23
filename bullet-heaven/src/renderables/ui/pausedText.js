@@ -8,10 +8,10 @@ class PausedText extends me.Renderable {
             300,
             150
         );
-        
+
         this.floating = true;
         this.anchorPoint.set(0.5, 0.5);
-        
+
         // Texto principal PAUSED
         this.pausedText = new me.Text(0, 0, {
             font: "Micro 5",
@@ -21,7 +21,7 @@ class PausedText extends me.Renderable {
             lineWidth: 5,
             textAlign: "center",
             textBaseline: "middle",
-            text: "PAUSED"
+            text: "PAUSADO"
         });
 
         // Texto de instrução
@@ -31,21 +31,21 @@ class PausedText extends me.Renderable {
             fillStyle: "#CCCCCC",
             textAlign: "center",
             textBaseline: "middle",
-            text: "Press P to Resume"
+            text: "Aperte P para retornar ao jogo"
         });
     }
 
     draw(renderer) {
         const x = this.pos.x - this.width / 2;
         const y = this.pos.y - this.height / 2;
-        
+
         // Fundo semi-transparente escuro
         renderer.save();
         renderer.setGlobalAlpha(0.8);
         renderer.setColor("#000000");
         renderer.fillRect(x, y, this.width, this.height);
         renderer.restore();
-        
+
         // Borda ao redor do painel (4px de largura desenhando 4 retângulos)
         renderer.setColor("#FFD700");
         const borderWidth = 4;
@@ -57,7 +57,7 @@ class PausedText extends me.Renderable {
         renderer.fillRect(x, y, borderWidth, this.height);
         // Direita
         renderer.fillRect(x + this.width - borderWidth, y, borderWidth, this.height);
-        
+
         // Desenha os textos
         this.pausedText.draw(renderer, this.pos.x, this.pos.y - 20);
         this.instructionText.draw(renderer, this.pos.x, this.pos.y + 40);

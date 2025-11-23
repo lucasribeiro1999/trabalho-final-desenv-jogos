@@ -1,4 +1,6 @@
 import * as me from "melonjs";
+
+import CONSTANTS from "../../constants.js";
 import { GameData } from "../../gameData.js";
 
 class XPHUD extends me.Container {
@@ -13,10 +15,12 @@ class XPHUD extends me.Container {
         });
         this.addChild(this.coinIcon);
 
-        this.xpText = new me.Text(36, 11, {
-            font: "sans-serif",
-            size: 22,
-            fillStyle: "#ffffff",
+        this.xpText = new me.Text(36, 0, {
+            font: "Micro 5",
+            size: 38,
+            fillStyle: CONSTANTS.COLORS.WHITE,
+            strokeStyle: CONSTANTS.COLORS.BLACK,
+            lineWidth: 0,
             textAlign: "left",
             textBaseline: "top",
         });
@@ -39,24 +43,12 @@ class XPHUD extends me.Container {
     update(dt) {
         super.update(dt)
 
-        // só atualiza se o XP mudou
         if (GameData.xp !== this.lastXP) {
             this.lastXP = GameData.xp;
             this.xpText.setText(String(this.lastXP));
-            return true; // precisa redesenhar
+            return true;
         }
         return false;
-
-        //  const newText = this.formatText();
-        // if (newText !== this.lastText) {
-        //     this.lastText = newText;
-        //     this.setText(newText);
-        //     return true;
-        //     this.goldText.setText("0");
-        //     this.addChild(this.goldText);
-
-        //     this.lastXP = -1;
-        // }
     }
 
 }

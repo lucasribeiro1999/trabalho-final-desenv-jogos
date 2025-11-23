@@ -3,7 +3,7 @@ import WeaponEntity from './weapon.js';
 import PlayScreen from '../stages/play.js';
 import CONSTANTS from '../constants.js';
 import { GameData } from '../gameData.js';
-import { updateWeaponLevel } from './utils/xpUtils.js';
+import { updateWeaponLevel } from '../utils/xpUtils.js';
 
 const PlayerState = {
     IDLE: "idle",
@@ -50,15 +50,22 @@ class PlayerEntity extends me.Entity {
 
         this.setupAnimations();
 
-        this.weapons = [
-            CONSTANTS.WEAPONS.PISTOL.NAME,
-            CONSTANTS.WEAPONS.RIFLE.NAME,
-            CONSTANTS.WEAPONS.SHOTGUN.NAME
-        ];
+        // Build weapons array from GameData - only include weapons that are unlocked (level > 0)
+        this.weapons = [];
+        if (GameData.weaponLevels.pistol > 0) {
+            this.weapons.push(CONSTANTS.WEAPONS.PISTOL.NAME);
+        }
+        if (GameData.weaponLevels.rifle > 0) {
+            this.weapons.push(CONSTANTS.WEAPONS.RIFLE.NAME);
+        }
+        if (GameData.weaponLevels.shotgun > 0) {
+            this.weapons.push(CONSTANTS.WEAPONS.SHOTGUN.NAME);
+        }
+
         this.weaponLevels = {
             pistol: GameData.weaponLevels.pistol ?? 1,
-            rifle: GameData.weaponLevels.rifle ?? 1,
-            shotgun: GameData.weaponLevels.shotgun ?? 1
+            rifle: GameData.weaponLevels.rifle ?? 0,
+            shotgun: GameData.weaponLevels.shotgun ?? 0
         };
         this.currentWeaponSlot = GameData.currentWeaponSlot;
         this.currentWeapon = new WeaponEntity(this, this.weapons[this.currentWeaponSlot]);
@@ -221,15 +228,15 @@ class PlayerEntity extends me.Entity {
 
     takeDamage() {
         if (this.currentState === PlayerState.COLLIDING) {
+            this.currentHealth -= 1;
+
             if (this.currentHealth <= 0) {
                 this.currentHealth = 0;
                 this.startDeath();
-            } else {
-                this.currentHealth -= 1;
-
-                GameData.currentHealth = this.currentHealth;
-                GameData.healthSystem.updateHealth(this.currentHealth);
             }
+
+            GameData.currentHealth = this.currentHealth;
+            GameData.healthSystem.updateHealth(this.currentHealth);
         }
     }
 
@@ -247,7 +254,7 @@ class PlayerEntity extends me.Entity {
     }
 
     // coleta/desbloqueio de armas via drop
-    addWeapon(type, level, rarity) {
+    addWeapon(type, level) {
         // Use centralized weapon level logic
         updateWeaponLevel(type, level);
 
