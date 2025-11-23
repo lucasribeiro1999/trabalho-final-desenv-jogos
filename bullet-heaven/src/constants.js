@@ -3,7 +3,7 @@ const defines = {
     PLAYER: { MAX_HEALTH: 5 },
     FIRE: { RATE_MS: 1000 },
     SPRITE: { SCALE_UP: 2 },
-    XP: { PER_ZOMBIE: 10 },
+    XP: { PER_ZOMBIE: 10, REROLL_COST: 50 },
     COLORS: {
         WHITE: "#ebecfa",
         BLUE: "#1f4bc5",
