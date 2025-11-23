@@ -8,6 +8,7 @@ import EnemyManager from "../managers/enemy-manager.js";
 import { HealthSystem } from '../managers/healthSystem.js';
 import PausedText from "../renderables/ui/pausedText.js";
 import CONSTANTS from "../constants.js";
+import WeaponDropEntity from "../renderables/weaponDropEntity.js";
 
 class PlayScreen extends me.Stage {
     static isPaused = false;
@@ -33,6 +34,7 @@ class PlayScreen extends me.Stage {
             GameData.currentWeaponSlot = 0;
             GameData.currentHealth = CONSTANTS.PLAYER.MAX_HEALTH;
             GameData.savedPlayerPos = null;
+            GameData.droppedWeapons = [];
             GameData.isNewRun = false;
         }
 
@@ -78,6 +80,22 @@ class PlayScreen extends me.Stage {
             player.pos.y = GameData.savedPlayerPos.y;
         }
         me.game.world.addChild(player, 1);
+
+        // Restaura armas dropadas se não for um novo jogo
+        if (!GameData.isNewRun && GameData.droppedWeapons && GameData.droppedWeapons.length > 0) {
+            GameData.droppedWeapons.forEach(drop => {
+                const weaponDrop = new WeaponDropEntity(
+                    drop.x,
+                    drop.y,
+                    drop.type,
+                    drop.level,
+                    drop.rarity
+                );
+                me.game.world.addChild(weaponDrop, 10);
+            });
+            // Limpa após restaurar para evitar duplicação se o reset for chamado novamente sem destroy
+            GameData.droppedWeapons = [];
+        }
 
         // HUD das armas — evita duplicar se já existir por algum motivo
         let existingHud = me.game.world.getChildByType(WeaponHudContainer)[0];
@@ -168,6 +186,19 @@ class PlayScreen extends me.Stage {
             me.game.world.removeChild(this.pauseTextRenderable);
             this.pauseTextRenderable = null;
         }
+
+        // Salva armas dropadas
+        GameData.droppedWeapons = [];
+        const drops = me.game.world.getChildByType(WeaponDropEntity);
+        drops.forEach(drop => {
+            GameData.droppedWeapons.push({
+                x: drop.pos.x,
+                y: drop.pos.y,
+                type: drop.weaponType,
+                level: drop.level,
+                rarity: drop.rarity
+            });
+        });
     }
 
     checkIfLoss(y) {

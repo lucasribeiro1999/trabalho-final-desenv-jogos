@@ -247,7 +247,7 @@ class PlayerEntity extends me.Entity {
     }
 
     // coleta/desbloqueio de armas via drop
-    addWeapon(type, level, rarity) {
+    addWeapon(type, level) {
         // Use centralized weapon level logic
         updateWeaponLevel(type, level);
 
