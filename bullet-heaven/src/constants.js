@@ -8,6 +8,9 @@ const defines = {
         BLUE: "#1f4bc5",
         PURPLE: "#6f20b9",
         ORANGE: "#df4620",
+        WHITE: "#ebecfa",
+        YELLOW: "#ffe02f",
+        RED: "#f00c3e",
     },
     LEVEL: {
         XP_PER_LEVEL: 50,

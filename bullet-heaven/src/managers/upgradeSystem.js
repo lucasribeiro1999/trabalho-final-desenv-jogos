@@ -36,9 +36,9 @@ function storeUpgradeToGameData(id) {
 }
 
 export class UpgradeSystem extends me.Container {
-    constructor() {
+    constructor(cardY) {
         super(0, 0, me.game.viewport.width, me.game.viewport.height);
-
+        this.cardY = cardY || (me.game.viewport.height / 2);
         this.drawUpgradeOptions()
     }
 
@@ -60,7 +60,7 @@ export class UpgradeSystem extends me.Container {
         const cardWidth = 235
         const cardSpacing = 70
 
-        const cardPositionY = (me.game.viewport.height / 2) - 32
+        const cardPositionY = this.cardY
 
         const middleCardPositionX = me.game.viewport.width / 2
 

@@ -1,6 +1,7 @@
 import * as me from 'melonjs';
-import { GameData } from '../gameData.js';
+
 import CONSTANTS from '../constants.js';
+import { GameData } from '../gameData.js';
 
 class GameOverScreen extends me.Stage {
     onResetEvent() {
@@ -16,10 +17,10 @@ class GameOverScreen extends me.Stage {
             me.game.viewport.height / 2 - 60,
             {
                 font: "Micro 5",
-                size: 72,
-                fillStyle: "#FF0000",
+                size: 148,
+                fillStyle: CONSTANTS.COLORS.RED,
                 strokeStyle: "#000000",
-                lineWidth: 6,
+                lineWidth: 0,
                 textAlign: "center",
                 textBaseline: "middle",
                 text: "GAME OVER"
@@ -34,10 +35,10 @@ class GameOverScreen extends me.Stage {
             me.game.viewport.height / 2 + 40,
             {
                 font: "Micro 5",
-                size: 28,
-                fillStyle: "#FFFFFF",
+                size: 48,
+                fillStyle: CONSTANTS.COLORS.WHITE,
                 strokeStyle: "#000000",
-                lineWidth: 3,
+                lineWidth: 0,
                 textAlign: "center",
                 textBaseline: "middle",
                 text: "Press ENTER to Restart"

@@ -1,5 +1,8 @@
 import * as me from 'melonjs'
+
 import { UpgradeSystem } from '../managers/upgradeSystem';
+
+import CONSTANTS from '../constants';
 
 me.state.UPGRADE_SELECTION = 0;
 
@@ -7,17 +10,16 @@ export class UpgradeSelectionScreen extends me.Stage {
     onResetEvent() {
         me.game.world.backgroundColor.parseCSS("#17171F");
 
-        // Título principal com fonte Micro 5
         const title = new me.Text(
-            me.game.viewport.width / 2, 
-            80, 
+            me.game.viewport.width / 2,
+            130,
             {
                 text: "Choose your upgrade!",
                 font: "Micro 5",
-                size: 48,
-                fillStyle: "#FFD700",
+                size: 72,
+                fillStyle: CONSTANTS.COLORS.YELLOW,
                 strokeStyle: "#000000",
-                lineWidth: 4,
+                lineWidth: 0,
                 textAlign: "center",
                 textBaseline: "middle"
             }
@@ -25,15 +27,16 @@ export class UpgradeSelectionScreen extends me.Stage {
         title.anchorPoint.set(0.5, 0.5);
         me.game.world.addChild(title);
 
-        // Subtítulo opcional
         const subtitle = new me.Text(
             me.game.viewport.width / 2,
-            140,
+            210,
             {
                 text: "Select one to continue",
                 font: "Micro 5",
-                size: 20,
-                fillStyle: "#CCCCCC",
+                size: 48,
+                fillStyle: CONSTANTS.COLORS.WHITE,
+                strokeStyle: "#000000",
+                lineWidth: 0,
                 textAlign: "center",
                 textBaseline: "middle"
             }
@@ -41,7 +44,7 @@ export class UpgradeSelectionScreen extends me.Stage {
         subtitle.anchorPoint.set(0.5, 0.5);
         me.game.world.addChild(subtitle);
 
-        const upgradeSystem = new UpgradeSystem()
+        const upgradeSystem = new UpgradeSystem(450)
         me.game.world.addChild(upgradeSystem, 9999)
     }
 }
