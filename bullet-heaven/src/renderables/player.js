@@ -51,9 +51,7 @@ class PlayerEntity extends me.Entity {
         this.setupAnimations();
 
         this.weapons = [
-            CONSTANTS.WEAPONS.PISTOL.NAME,
-            CONSTANTS.WEAPONS.RIFLE.NAME,
-            CONSTANTS.WEAPONS.SHOTGUN.NAME
+            CONSTANTS.WEAPONS.PISTOL.NAME
         ];
         this.weaponLevels = {
             pistol: GameData.weaponLevels.pistol ?? 1,

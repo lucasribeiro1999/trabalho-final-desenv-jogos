@@ -26,8 +26,8 @@ class PlayScreen extends me.Stage {
             GameData.xp = 0;
             GameData.weaponLevels = {
                 pistol: 1,
-                rifle: 1,
-                shotgun: 1
+                rifle: 0,
+                shotgun: 0
             };
             GameData.currentWave = 0;
             GameData.activeUpgrades = new Map();

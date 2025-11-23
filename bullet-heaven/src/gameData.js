@@ -7,8 +7,8 @@ export const GameData = {
     // níveis das armas
     weaponLevels: {
         pistol: 1,
-        rifle: 1,
-        shotgun: 1
+        rifle: 0,
+        shotgun: 0
     },
 
     // wave atual
