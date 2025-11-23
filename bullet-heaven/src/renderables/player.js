@@ -9,7 +9,7 @@ const PlayerState = {
     MOVING: "moving",
     COLLIDING: "colliding",
     DYING: "dying"
-}
+};
 
 class PlayerEntity extends me.Entity {
     currentState = PlayerState.IDLE;
@@ -65,8 +65,8 @@ class PlayerEntity extends me.Entity {
     }
 
     get velocity() {
-        const velocityUpgrade = GameData.activeUpgrades.get(CONSTANTS.UPGRADES.MOVE_SPEED_INCREASE)
-        const upgradeLevel = velocityUpgrade?.level ?? 0
+        const velocityUpgrade = GameData.activeUpgrades.get(CONSTANTS.UPGRADES.MOVE_SPEED_INCREASE);
+        const upgradeLevel = velocityUpgrade?.level ?? 0;
 
         return this.baseVelocity + 32 * upgradeLevel;
     }
@@ -77,7 +77,6 @@ class PlayerEntity extends me.Entity {
             slot < this.weapons.length &&
             this.weapons?.[slot] !== this.currentWeapon?.currentType
         ) {
-            // Remove arma atual
             if (this.currentWeapon) {
                 me.game.world.removeChild(this.currentWeapon);
             }
@@ -138,35 +137,35 @@ class PlayerEntity extends me.Entity {
         const prevY = this.pos.y;
         this.isMoving = false;
 
-        if (this.currentState === PlayerState.DYING) return false
+        if (this.currentState === PlayerState.DYING) return false;
 
         this.currentState = PlayerState.IDLE;
 
         if (me.input.isKeyPressed("left")) {
             this.pos.x -= this.velocity * dt / 1000;
             this.facing = 'left';
-            this.currentState = PlayerState.MOVING
+            this.currentState = PlayerState.MOVING;
             this.switchToDirection('left');
             this.isMoving = true;
         }
         if (me.input.isKeyPressed("right")) {
             this.pos.x += this.velocity * dt / 1000;
             this.facing = 'right';
-            this.currentState = PlayerState.MOVING
+            this.currentState = PlayerState.MOVING;
             this.switchToDirection('right');
             this.isMoving = true;
         }
         if (me.input.isKeyPressed("up")) {
             this.pos.y -= this.velocity * dt / 1000;
             this.facing = 'up';
-            this.currentState = PlayerState.MOVING
+            this.currentState = PlayerState.MOVING;
             this.switchToDirection('up');
             this.isMoving = true;
         }
         if (me.input.isKeyPressed("down")) {
             this.pos.y += this.velocity * dt / 1000;
             this.facing = 'down';
-            this.currentState = PlayerState.MOVING
+            this.currentState = PlayerState.MOVING;
             this.switchToDirection('down');
             this.isMoving = true;
         }
@@ -183,18 +182,18 @@ class PlayerEntity extends me.Entity {
             this.switchToIdle();
         }
 
-        // Sincroniza limites (paredes)
+        // Limites (paredes)
         this.pos.x = me.Math.clamp(this.pos.x, this.minX, this.maxX);
         this.pos.y = me.Math.clamp(this.pos.y, this.minY, this.maxY);
         this._lastValidX = prevX;
         this._lastValidY = prevY;
 
-        // Sincroniza níveis das armas com GameData (caso ganhe por drop ou XP)
+        // Sincroniza níveis das armas com GameData
         this.weaponLevels.pistol = GameData.weaponLevels.pistol;
         this.weaponLevels.rifle = GameData.weaponLevels.rifle;
         this.weaponLevels.shotgun = GameData.weaponLevels.shotgun;
 
-        // Opcional: Atualize a arma equipada se o nível aumentar
+        // Atualiza a arma equipada se o nível aumentar
         if (this.currentWeapon?.refreshStatsFromLevel) {
             this.currentWeapon.refreshStatsFromLevel();
         }
@@ -203,17 +202,21 @@ class PlayerEntity extends me.Entity {
     }
 
     healDamage() {
-        const healthSystem = GameData.healthSystem
+        const healthSystem = GameData.healthSystem;
+        if (!healthSystem) return;
 
-        if (this.currentHealth >= healthSystem.maxHeartCount) {
-            return
+        const maxHearts = healthSystem.maxHeartCount;
+
+        // já está com a vida máxima
+        if (this.currentHealth >= maxHearts) {
+            return;
         }
 
+        this.currentHealth += 1;
         GameData.currentHealth = this.currentHealth;
 
         healthSystem.updateHealth(this.currentHealth);
     }
-
 
     takeDamage() {
         if (this.currentState === PlayerState.COLLIDING) {
@@ -221,7 +224,7 @@ class PlayerEntity extends me.Entity {
                 this.currentHealth = 0;
                 this.startDeath();
             } else {
-                this.currentHealth -= 1
+                this.currentHealth -= 1;
 
                 GameData.currentHealth = this.currentHealth;
                 GameData.healthSystem.updateHealth(this.currentHealth);
@@ -242,20 +245,15 @@ class PlayerEntity extends me.Entity {
         }, 1000);
     }
 
-    // NOVO: coleta/desbloqueio de armas via drop
+    // coleta/desbloqueio de armas via drop
     addWeapon(type, level, rarity) {
-        // Atualiza arma no inventário se nível for maior
         if (level > (this.weaponLevels[type] ?? 1)) {
             this.weaponLevels[type] = level;
             GameData.weaponLevels[type] = level;
-            // Troca de arma automática pode ser feita aqui se preferir
-            // this.switchWeapon(this.weapons.indexOf(type));
         }
-        // Se for arma nova, garante que está no slot
         if (!this.weapons.includes(type)) {
             this.weapons.push(type);
         }
-        // Mensagem de coleta (debug)
         console.log(`Arma coletada: ${type}, nível ${level}, raridade ${rarity}`);
     }
 
@@ -277,7 +275,7 @@ class PlayerEntity extends me.Entity {
             return false;
         }
 
-        // NOVO: coleta de arma via drop
+        // coleta de arma via drop
         if (other.body.collisionType === me.collision.types.COLLECTABLE_OBJECT) {
             if (typeof other.onCollision === "function") {
                 other.onCollision(response, this);
