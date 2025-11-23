@@ -50,13 +50,22 @@ class PlayerEntity extends me.Entity {
 
         this.setupAnimations();
 
-        this.weapons = [
-            CONSTANTS.WEAPONS.PISTOL.NAME
-        ];
+        // Build weapons array from GameData - only include weapons that are unlocked (level > 0)
+        this.weapons = [];
+        if (GameData.weaponLevels.pistol > 0) {
+            this.weapons.push(CONSTANTS.WEAPONS.PISTOL.NAME);
+        }
+        if (GameData.weaponLevels.rifle > 0) {
+            this.weapons.push(CONSTANTS.WEAPONS.RIFLE.NAME);
+        }
+        if (GameData.weaponLevels.shotgun > 0) {
+            this.weapons.push(CONSTANTS.WEAPONS.SHOTGUN.NAME);
+        }
+
         this.weaponLevels = {
             pistol: GameData.weaponLevels.pistol ?? 1,
-            rifle: GameData.weaponLevels.rifle ?? 1,
-            shotgun: GameData.weaponLevels.shotgun ?? 1
+            rifle: GameData.weaponLevels.rifle ?? 0,
+            shotgun: GameData.weaponLevels.shotgun ?? 0
         };
         this.currentWeaponSlot = GameData.currentWeaponSlot;
         this.currentWeapon = new WeaponEntity(this, this.weapons[this.currentWeaponSlot]);
