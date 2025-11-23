@@ -54,12 +54,7 @@ class WeaponHud extends me.UISpriteElement {
     update(dt) {
         const currentLevel = GameData.weaponLevels[this.weaponType];
 
-        // Se a arma foi desbloqueada (level > 0) mas ainda não desenhamos o texto/ícone
         if (currentLevel > 0 && !this.xpText) {
-            // Precisamos redesenhar (chama drawWeapon usando a posição relativa correta)
-            // Nota: drawWeapon usa this.parent.addChild, então as coordenadas são relativas ao parent?
-            // O construtor chamou drawWeapon(x, y). Mas x e y não estão salvos na instância além de this.pos.
-            // O UISpriteElement tem this.pos.x e this.pos.y.
             this.drawWeapon(this.pos.x, this.pos.y);
         }
 
