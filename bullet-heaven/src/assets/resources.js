@@ -17,7 +17,7 @@ export let GAME_RESOURCES = [
     { name: "fire-down", type: "image", src: "src/assets/shoots/fire/down.png" },
     { name: "fire-left", type: "image", src: "src/assets/shoots/fire/left.png" },
     { name: "fire-right", type: "image", src: "src/assets/shoots/fire/right.png" },
-    { name: "map-01", type: "image", src: "src/assets/zombie-apocalypse.png" },
+    { name: "map-01", type: "image", src: "src/assets/zombie-bleak-city-2.png" },
     { name: "filled-heart", type: "image", src: "src/assets/health/filled-heart.png" },
     { name: "empty-heart", type: "image", src: "src/assets/health/empty-heart.png" },
     { name: "heart", type: "image", src: "src/assets/health/heart.png" },

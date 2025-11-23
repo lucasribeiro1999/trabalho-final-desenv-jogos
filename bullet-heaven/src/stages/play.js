@@ -43,30 +43,30 @@ class PlayScreen extends me.Stage {
         }
 
         me.game.world.backgroundColor.parseCSS("#707B64");
+
+        // Use ImageLayer for proper background handling
+        const bgLayer = new me.ImageLayer(0, 0, {
+            image: "map-01",
+            repeat: "repeat"
+        });
+
+        // Scale to cover the entire viewport
         const bgImage = me.loader.getImage("map-01");
-        if (bgImage) {
-            const bg = new me.Renderable(
-                0, 0,
-                me.game.viewport.width, me.game.viewport.height
-            );
-            bg.draw = function (renderer) {
-                if (bgImage.width > 0 && bgImage.height > 0) {
-                    const scaleX = me.game.viewport.width / bgImage.width;
-                    const scaleY = me.game.viewport.height / bgImage.height;
-                    const scale = Math.min(scaleX, scaleY);
-                    const scaledWidth = bgImage.width * scale;
-                    const scaledHeight = bgImage.height * scale;
-                    const offsetX = me.game.viewport.width / 2;
-                    const offsetY = me.game.viewport.height / 2;
-                    renderer.drawImage(
-                        bgImage,
-                        offsetX, offsetY,
-                        scaledWidth, scaledHeight
-                    );
-                }
-            };
-            me.game.world.addChild(bg, 0);
+        if (bgImage && bgImage.width > 0 && bgImage.height > 0) {
+            const scaleX = me.game.viewport.width / bgImage.width;
+            const scaleY = me.game.viewport.height / bgImage.height;
+            const scale = Math.max(scaleX, scaleY);
+            const scaledWidth = bgImage.width * scale;
+            const scaledHeight = bgImage.height * scale;
+
+            bgLayer.resize(scaledWidth, scaledHeight);
+
+            // Position at top-left to fill screen
+            bgLayer.pos.x = -260;
+            bgLayer.pos.y = -20;
         }
+
+        me.game.world.addChild(bgLayer, 0);
 
         // atlas do player
         me.game.playerAtlas = new me.TextureAtlas(
