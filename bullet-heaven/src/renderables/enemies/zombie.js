@@ -3,50 +3,30 @@ import * as me from "melonjs";
 import PlayScreen from "../../stages/play.js";
 
 import PlayerEntity from "../player.js";
-import WeaponDropEntity from "../weaponDropEntity.js";
-
 import { recalculateWeaponLevelsFromXP } from "../utils/xpUtils.js";
 
 import { GameData } from "../../gameData.js";
-import CONSTANTS, { WEAPON_DROP_RARITIES } from "../../constants.js";
+import CONSTANTS from "../../constants.js";
+import WeaponDropEntity from "../weaponDropEntity.js";
 
-function tryDropWeapon(posX, posY) {
-    const luckUpgrade = GameData.activeUpgrades.get(CONSTANTS.UPGRADES.LUCK_INCREASE);
-    const luckLevel = luckUpgrade?.level ?? 0;
-    const dropChance = 0.10 + (luckLevel * 0.05);
-
-    if (Math.random() < dropChance) {
-        let roll = Math.random() * 100;
-        let acc = 0;
-        let r;
-        for (const rarity of WEAPON_DROP_RARITIES) {
-            acc += rarity.chance;
-            if (roll < acc) {
-                r = rarity;
-                break;
-            }
-        }
-
-        const weaponTypes = ["pistol", "rifle", "shotgun"];
-        const type = weaponTypes[Math.floor(Math.random() * weaponTypes.length)];
-        const level = r.minLevel === r.maxLevel
-            ? r.maxLevel
-            : r.minLevel + Math.floor(Math.random() * (r.maxLevel - r.minLevel + 1));
-
-        me.game.world.addChild(
-            new WeaponDropEntity(posX, posY, type, level, r.type),
-            5
-        );
-    }
-}
 export class Zombie extends me.Sprite {
-    constructor(x, y, image, frameWidth, frameHeight, initialHealth = 1, level = 1, baseAttackCooldown = 1000) {
+    constructor(
+        x,
+        y,
+        image,
+        frameWidth,
+        frameHeight,
+        initialHealth = 1,
+        level = 1,
+        baseAttackCooldown = 1000
+    ) {
         super(x, y, {
             image,
             framewidth: frameWidth,
             frameheight: frameHeight,
         });
 
+        // BODY BÁSICO (será reconfigurado no _setupZombieBody)
         this.body = new me.Body(this);
         this.body.addShape(new me.Rect(0, 0, this.width, this.height));
         this.body.collisionType = me.collision.types.ENEMY_OBJECT;
@@ -59,8 +39,8 @@ export class Zombie extends me.Sprite {
         this.isDying = false;
 
         this.health = CONSTANTS.ENEMY.BASE_HEALTH;
-
         this.health = initialHealth;
+
         this.attackDamage = this.calculateAttack();
         this.speed = this.calculateSpeed();
 
@@ -72,18 +52,27 @@ export class Zombie extends me.Sprite {
 
         this.isDying = false;
 
-        this.#_setupAnimation()
-        this.#_setupZombieBody()
+        // Manager lógico de drop de arma (não é Sprite)
+        this.weaponDropManager = new WeaponDropEntity();
+
+        this.#_setupAnimation();
+        this.#_setupZombieBody();
     }
 
     calculateAttack() {
-        return this.baseAttack + (this.level - 1) * 2; // +2 dmg per level
+        // +2 de dano por level
+        return this.baseAttack + (this.level - 1) * 2;
     }
 
     calculateSpeed() {
-        return this.baseSpeed + (this.level - 1) * 5; // +5 speed per level
+        // +5 de velocidade por level
+        return this.baseSpeed + (this.level - 1) * 5;
     }
 
+    /**
+     * startDeath pode ser chamado pelas subclasses com sprites customizados
+     * ou sem parâmetros (usa comportamento padrão da classe base)
+     */
     startDeath(image, frameWidth, frameHeight, animationSprites) {
         if (this.isDying) return;
 
@@ -97,13 +86,22 @@ export class Zombie extends me.Sprite {
 
         GameData.xp += CONSTANTS.XP.PER_ZOMBIE * xpMultiplier;
 
-        // Atualiza nível das armas (só pistola, pelo xpUtils.js)
+        // Atualiza nível das armas (pistola) via XP
         recalculateWeaponLevelsFromXP();
 
-        // Drop de arma
-        tryDropWeapon(this.pos.x, this.pos.y);
+        // Agora o drop é puramente lógico (sem sprite no mundo)
+        if (this.weaponDropManager) {
+            this.weaponDropManager.tryDrop(this.pos.x, this.pos.y, GameData.player);
+        }
 
-        // Efeito visual de morte
+        // Se a subclasse não mandou sprite de morte, simplesmente remove o zumbi
+        if (!image || !frameWidth || !frameHeight || !animationSprites) {
+            const parent = this.ancestor || me.game.world;
+            parent?.removeChild(this);
+            return;
+        }
+
+        // Efeito visual de morte (sprite temporário)
         const parent = this.ancestor || me.game.world;
         const deathSprite = new me.Sprite(this.pos.x, this.pos.y, {
             image: image,
@@ -125,10 +123,11 @@ export class Zombie extends me.Sprite {
 
         this.health -= amount;
         if (this.health <= 0) {
+            // Se as subclasses quiserem animação customizada, elas chamam
+            // super.startDeath(...) com os parâmetros corretos.
             this.startDeath();
         }
     }
-
 
     onCollision(response, other) {
         if (other.body.collisionType === me.collision.types.PROJECTILE_OBJECT) {
@@ -171,14 +170,17 @@ export class Zombie extends me.Sprite {
 
         const prevX = this.pos.x;
         const prevY = this.pos.y;
+
         if (this.isDying) {
             return true;
         }
+
         const players = me.game.world.getChildByType(PlayerEntity);
         if (players && players.length > 0) {
             const player = players[0];
-            const targetX = player.getBounds().x;
-            const targetY = player.getBounds().y;
+            const bounds = player.getBounds();
+            const targetX = bounds.x;
+            const targetY = bounds.y;
             const dx = targetX - this.getBounds().centerX;
             const dy = targetY - this.getBounds().centerY;
             const len = Math.hypot(dx, dy);
@@ -194,7 +196,6 @@ export class Zombie extends me.Sprite {
         this._lastValidY = prevY;
         return true;
     }
-
 
     #_setupAnimation() {
         this.addAnimation("idle", [0, 1, 2, 3, 4, 5], 350);
@@ -219,6 +220,5 @@ export class Zombie extends me.Sprite {
                 me.collision.types.PROJECTILE_OBJECT
             );
         }
-
     }
 }
