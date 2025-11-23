@@ -31,9 +31,11 @@ class WeaponDropEntity extends me.Sprite {
 
     draw(renderer) {
         let color = "#ffffff";
-        if (this.level === 1) color = CONSTANTS.COLORS.BLUE;      // Lighter Blue
-        else if (this.level === 2) color = CONSTANTS.COLORS.PURPLE; // Lighter Purple
-        else if (this.level >= 3) color = CONSTANTS.COLORS.ORANGE;  // Lighter Orange
+        if (this.level === 1) color = CONSTANTS.COLORS.GREEN;
+        else if (this.level === 2) color = CONSTANTS.COLORS.BLUE;
+        else if (this.level === 3) color = CONSTANTS.COLORS.PURPLE;
+        else if (this.level === 4) color = CONSTANTS.COLORS.ORANGE;
+        else if (this.level >= 5) color = CONSTANTS.COLORS.YELLOW;
 
         const ctx = renderer.getContext();
         const centerX = this.pos.x + this.width / 2;

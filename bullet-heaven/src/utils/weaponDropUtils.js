@@ -1,5 +1,5 @@
 export function tryCalculateDrop(luckLevel = 0) {
-    const dropChance = 0.10 + (luckLevel * 0.05);
+    const dropChance = 0.20 + (luckLevel * 0.05);
 
     if (Math.random() >= dropChance) {
         return null;
