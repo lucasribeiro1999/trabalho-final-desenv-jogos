@@ -8,6 +8,7 @@ import { recalculateWeaponLevelsFromXP } from "../utils/xpUtils.js";
 import { GameData } from "../../gameData.js";
 import CONSTANTS from "../../constants.js";
 import WeaponDropEntity from "../weaponDropEntity.js";
+import { tryCalculateDrop } from "../../utils/weaponDropUtils.js";
 
 export class Zombie extends me.Sprite {
     constructor(
@@ -52,9 +53,6 @@ export class Zombie extends me.Sprite {
 
         this.isDying = false;
 
-        // Manager lógico de drop de arma (não é Sprite)
-        this.weaponDropManager = new WeaponDropEntity();
-
         this.#_setupAnimation();
         this.#_setupZombieBody();
     }
@@ -89,10 +87,22 @@ export class Zombie extends me.Sprite {
         // Atualiza nível das armas (pistola) via XP
         recalculateWeaponLevelsFromXP();
 
-        // Agora o drop é puramente lógico (sem sprite no mundo)
-        if (this.weaponDropManager) {
-            this.weaponDropManager.tryDrop(this.pos.x, this.pos.y, GameData.player);
+        const luckUpgrade = GameData.activeUpgrades.get(CONSTANTS.UPGRADES.LUCK_INCREASE);
+        const luckLevel = luckUpgrade?.level ?? 0;
+
+        const dropData = tryCalculateDrop(luckLevel);
+
+        if (dropData) {
+            const weaponDropped = new WeaponDropEntity(
+                this.pos.x,
+                this.pos.y,
+                dropData.type,
+                dropData.level,
+                dropData.rarity
+            );
+            me.game.world.addChild(weaponDropped, 10); // Ensure it's above ground
         }
+
 
         // Se a subclasse não mandou sprite de morte, simplesmente remove o zumbi
         if (!image || !frameWidth || !frameHeight || !animationSprites) {

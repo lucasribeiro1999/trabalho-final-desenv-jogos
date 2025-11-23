@@ -3,6 +3,7 @@ import WeaponEntity from './weapon.js';
 import PlayScreen from '../stages/play.js';
 import CONSTANTS from '../constants.js';
 import { GameData } from '../gameData.js';
+import { updateWeaponLevel } from './utils/xpUtils.js';
 
 const PlayerState = {
     IDLE: "idle",
@@ -247,14 +248,13 @@ class PlayerEntity extends me.Entity {
 
     // coleta/desbloqueio de armas via drop
     addWeapon(type, level, rarity) {
-        if (level > (this.weaponLevels[type] ?? 1)) {
-            this.weaponLevels[type] = level;
-            GameData.weaponLevels[type] = level;
-        }
+        // Use centralized weapon level logic
+        updateWeaponLevel(type, level);
+
+        // Se for arma nova, garante que está no slot
         if (!this.weapons.includes(type)) {
             this.weapons.push(type);
         }
-        console.log(`Arma coletada: ${type}, nível ${level}, raridade ${rarity}`);
     }
 
     onCollision(response, other) {
