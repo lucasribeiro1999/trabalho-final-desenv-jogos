@@ -3,7 +3,7 @@ import * as me from "melonjs";
 import PlayScreen from "../../stages/play.js";
 
 import PlayerEntity from "../player.js";
-import { recalculateWeaponLevelsFromXP } from "../utils/xpUtils.js";
+import { recalculateWeaponLevelsFromXP } from "../../utils/xpUtils.js";
 
 import { GameData } from "../../gameData.js";
 import CONSTANTS from "../../constants.js";

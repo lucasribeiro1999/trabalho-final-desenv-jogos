@@ -3,7 +3,7 @@ import WeaponEntity from './weapon.js';
 import PlayScreen from '../stages/play.js';
 import CONSTANTS from '../constants.js';
 import { GameData } from '../gameData.js';
-import { updateWeaponLevel } from './utils/xpUtils.js';
+import { updateWeaponLevel } from '../utils/xpUtils.js';
 
 const PlayerState = {
     IDLE: "idle",

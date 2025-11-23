@@ -1,5 +1,5 @@
-import CONSTANTS from "../../constants.js";
-import { GameData } from "../../gameData.js";
+import CONSTANTS from "../constants.js";
+import { GameData } from "../gameData.js";
 
 /**
  * Centralized weapon level update logic

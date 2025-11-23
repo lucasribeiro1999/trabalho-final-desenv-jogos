@@ -1,6 +1,6 @@
 import * as me from 'melonjs'
 
-import { pickXValuesRandomly } from '../renderables/utils/pickXValuesRandomly';
+import { pickXValuesRandomly } from '../utils/pickXValuesRandomly';
 
 import CONSTANTS from '../constants'
 import { GameData } from '../gameData';
