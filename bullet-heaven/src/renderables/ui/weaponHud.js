@@ -1,6 +1,7 @@
 import * as me from "melonjs";
 
 import { GameData } from "../../gameData";
+import CONSTANTS from "../../constants.js";
 
 class WeaponHud extends me.UISpriteElement {
     constructor(x, y, player, weaponType, parent, isActive) {
@@ -36,7 +37,7 @@ class WeaponHud extends me.UISpriteElement {
         console.log(GameData.weaponLevels);
 
         const thisWeaponLevel = GameData.weaponLevels[this.weaponType]
-        const xpText = new me.Text(x + 10, y + 6, {
+        this.xpText = new me.Text(x + 10, y + 6, {
             font: "sans-serif",
             size: 25,
             fillStyle: "#ffffff",
@@ -44,8 +45,17 @@ class WeaponHud extends me.UISpriteElement {
             textBaseline: "top",
             strokeStyle: "#000"
         });
-        xpText.setText(thisWeaponLevel)
-        this.parent.addChild(xpText, 101);
+        this.xpText.setText(thisWeaponLevel)
+        this.parent.addChild(this.xpText, 101);
+    }
+
+    update(dt) {
+        // Update the weapon level text
+        if (this.xpText) {
+            const currentLevel = GameData.weaponLevels[this.weaponType];
+            this.xpText.setText(currentLevel);
+        }
+        return super.update(dt);
     }
 
     drawHighlight() {
@@ -57,7 +67,14 @@ class WeaponHud extends me.UISpriteElement {
         super.draw(renderer);
 
         if (this.player.currentWeapon?.currentType === this.weaponType) {
-            renderer.setColor("yellow");
+            const weaponLevel = GameData.weaponLevels[this.weaponType];
+            let strokeColor = "yellow";
+
+            if (weaponLevel === 1) strokeColor = CONSTANTS.COLORS.BLUE;
+            else if (weaponLevel === 2) strokeColor = CONSTANTS.COLORS.PURPLE;
+            else if (weaponLevel >= 3) strokeColor = CONSTANTS.COLORS.ORANGE;
+
+            renderer.setColor(strokeColor);
             renderer.strokeRect(this.pos.x, this.pos.y, this.width, this.height);
         }
     }

@@ -1,70 +1,71 @@
-import CONSTANTS, { WEAPON_DROP_RARITIES } from "../constants.js";
-import { GameData } from "../gameData.js";
+import * as me from "melonjs";
 
-/**
- * Classe apenas lógica para gerenciar DROPS de arma.
- * Não é Sprite, não é Renderable, não é adicionada no world.
- */
-class WeaponDropEntity {
-    constructor() {
-        // futuro: podemos receber configs aqui se precisar
+import CONSTANTS from "../constants.js";
+
+class WeaponDropEntity extends me.Sprite {
+    constructor(x, y, weaponType, level, rarity) {
+        super(x, y, {
+            image: weaponType,
+            framewidth: 16,
+            frameheight: 16
+        });
+        this.weaponType = weaponType;
+        this.level = level;
+        this.rarity = rarity;
+
+        this.body = new me.Body(this);
+        this.body.addShape(new me.Rect(0, 0, this.width, this.height));
+        this.body.collisionType = me.collision.types.COLLECTABLE_OBJECT;
+        this.body.setCollisionMask(me.collision.types.PLAYER_OBJECT);
+
+        this.scale(2)
+
+        // MANTÉM ITEM PARADO
+        if (this.body.setStatic) this.body.setStatic(true);     // Fica imóvel
+        this.body.ignoreGravity = true;
+        if (this.body.setSensor) this.body.setSensor(true);     // Vira 'sensor': detecta, mas não empurra
+
+        this.alwaysUpdate = true;
+        this.lifeTime = 30000;
     }
 
-    /**
-     * Tenta realizar um drop de arma.
-     * - Usa o upgrade de sorte para aumentar a chance.
-     * - Escolhe raridade com base em WEAPON_DROP_RARITIES.
-     * - Escolhe arma (pistol, rifle, shotgun).
-     * - Entrega diretamente para o player (sem sprite no mundo).
-     *
-     * @param {number} posX - posição X do zumbi (apenas para referência futura, se quiser FX)
-     * @param {number} posY - posição Y do zumbi
-     * @param {object} killerPlayer - opcional, player que matou; se não enviado, usa GameData.player
-     */
-    tryDrop(posX, posY, killerPlayer) {
-        const luckUpgrade = GameData.activeUpgrades.get(CONSTANTS.UPGRADES.LUCK_INCREASE);
-        const luckLevel = luckUpgrade?.level ?? 0;
-        const dropChance = 0.10 + (luckLevel * 0.05);
+    draw(renderer) {
+        let color = "#ffffff";
+        if (this.level === 1) color = CONSTANTS.COLORS.BLUE;      // Lighter Blue
+        else if (this.level === 2) color = CONSTANTS.COLORS.PURPLE; // Lighter Purple
+        else if (this.level >= 3) color = CONSTANTS.COLORS.ORANGE;  // Lighter Orange
 
-        // Falhou o roll de drop? Retorna direto.
-        if (Math.random() >= dropChance) {
-            return;
+        const ctx = renderer.getContext();
+        const centerX = this.pos.x + this.width / 2;
+        const centerY = this.pos.y + this.height / 2;
+        const radius = 12;
+
+        // Create radial gradient for glow effect
+        const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+        gradient.addColorStop(0, color + "40"); // Very subtle center
+        gradient.addColorStop(0.4, color + "30"); // Fade
+        gradient.addColorStop(1, color + "00"); // Fully transparent
+
+        renderer.save();
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = color;
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.fill();
+        renderer.restore();
+
+        super.draw(renderer);
+    }
+
+    onCollision(response, other) {
+        if (typeof other.addWeapon === "function") {
+            other.addWeapon(this.weaponType, this.level, this.rarity);
+
+            // Remove do mundo após ser pego
+            me.game.world.removeChild(this);
         }
-
-        // Escolhe raridade com base nas chances
-        let roll = Math.random() * 100;
-        let acc = 0;
-        let chosenRarity = WEAPON_DROP_RARITIES[0];
-
-        for (const rarity of WEAPON_DROP_RARITIES) {
-            acc += rarity.chance;
-            if (roll < acc) {
-                chosenRarity = rarity;
-                break;
-            }
-        }
-
-        // Escolhe a arma
-        const weaponTypes = ["pistol", "rifle", "shotgun"];
-        const type = weaponTypes[Math.floor(Math.random() * weaponTypes.length)];
-
-        // Nível da arma com base na raridade
-        const level = (chosenRarity.minLevel === chosenRarity.maxLevel)
-            ? chosenRarity.maxLevel
-            : chosenRarity.minLevel + Math.floor(Math.random() * (chosenRarity.maxLevel - chosenRarity.minLevel + 1));
-
-        // Descobre qual player recebe (normalmente GameData.player)
-        const player = killerPlayer || GameData.player;
-
-        if (player && typeof player.addWeapon === "function") {
-            player.addWeapon(type, level, chosenRarity.type);
-        }
-
-        // Debug opcional
-        console.log(
-            `[WeaponDropEntity] Drop gerado em (${posX.toFixed(0)},${posY.toFixed(0)}) -> ` +
-            `${type} lvl ${level} (${chosenRarity.type})`
-        );
+        return false;
     }
 }
 

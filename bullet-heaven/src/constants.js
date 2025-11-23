@@ -4,6 +4,11 @@ const defines = {
     FIRE: { RATE_MS: 1000 },
     SPRITE: { SCALE_UP: 2 },
     XP: { PER_ZOMBIE: 10 },
+    COLORS: {
+        BLUE: "#1f4bc5",
+        PURPLE: "#6f20b9",
+        ORANGE: "#df4620",
+    },
     LEVEL: {
         XP_PER_LEVEL: 50,
         MAX_WEAPON_LEVEL: 5
