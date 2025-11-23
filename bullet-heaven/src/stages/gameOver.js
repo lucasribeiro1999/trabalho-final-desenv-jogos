@@ -5,7 +5,8 @@ import CONSTANTS from '../constants.js';
 
 class GameOverScreen extends me.Stage {
     onResetEvent() {
-        me.game.world.children.length = 0; // Limpa todos os objetos do mundo
+        // Limpa todos os objetos do mundo
+        me.game.world.children.length = 0;
 
         // Fundo preto
         me.game.world.backgroundColor.parseCSS('#000000');
@@ -32,8 +33,21 @@ class GameOverScreen extends me.Stage {
     update() {
         if (me.input.isKeyPressed("enter")) {
             me.input.unbindKey(me.input.KEY.ENTER);
+
+            // Próximo PLAY será um NOVO JOGO
+            GameData.isNewRun = true;
             GameData.currentWeaponSlot = 0;
             GameData.currentHealth = CONSTANTS.PLAYER.MAX_HEALTH;
+            GameData.xp = 0;
+            GameData.weaponLevels = {
+                pistol: 1,
+                rifle: 1,
+                shotgun: 1
+            };
+            GameData.currentWave = 0;
+            GameData.activeUpgrades = new Map();
+            GameData.savedPlayerPos = null;
+
             me.state.change(me.state.PLAY);
         }
         return true;
@@ -41,7 +55,6 @@ class GameOverScreen extends me.Stage {
 
     onDestroyEvent() {
         me.input.unbindKey(me.input.KEY.ENTER);
-        // Não limpe manualmente me.game.world.children aqui.
     }
 }
 

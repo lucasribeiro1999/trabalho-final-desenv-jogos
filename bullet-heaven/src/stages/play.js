@@ -7,6 +7,7 @@ import WeaponHudContainer from "../renderables/ui/weaponHudContainer.js";
 import EnemyManager from "../managers/enemy-manager.js";
 import { HealthSystem } from '../managers/healthSystem.js';
 import PausedText from "../renderables/ui/pausedText.js";
+import CONSTANTS from "../constants.js";
 
 class PlayScreen extends me.Stage {
     static isPaused = false;
@@ -15,11 +16,25 @@ class PlayScreen extends me.Stage {
     _pauseKeyPressed = false;
 
     onResetEvent() {
-        // sempre que começar/der reset na fase, zera o XP e os níveis
-        GameData.xp = 0;
-        GameData.weaponLevels.pistol = 1;
-        GameData.weaponLevels.rifle = 1;
-        GameData.weaponLevels.shotgun = 1;
+        /**
+         * Se for um "novo jogo" (primeira vez ou depois do GAME OVER),
+         * resetamos tudo. Se viermos apenas da tela de upgrades, NÃO
+         * devemos zerar XP, níveis, upgrades, etc.
+         */
+        if (GameData.isNewRun) {
+            GameData.xp = 0;
+            GameData.weaponLevels = {
+                pistol: 1,
+                rifle: 1,
+                shotgun: 1
+            };
+            GameData.currentWave = 0;
+            GameData.activeUpgrades = new Map();
+            GameData.currentWeaponSlot = 0;
+            GameData.currentHealth = CONSTANTS.PLAYER.MAX_HEALTH;
+            GameData.savedPlayerPos = null;
+            GameData.isNewRun = false;
+        }
 
         me.game.world.backgroundColor.parseCSS("#707B64");
         const bgImage = me.loader.getImage("map-01");
@@ -47,24 +62,34 @@ class PlayScreen extends me.Stage {
             me.game.world.addChild(bg, 0);
         }
 
+        // atlas do player
         me.game.playerAtlas = new me.TextureAtlas(
             me.loader.getJSON("player"),
             me.loader.getImage("player")
         );
 
+        // cria player usando os dados atuais do GameData
         const player = new PlayerEntity();
+        GameData.player = player;
+
+        // se havia posição salva (vinda da tela de upgrade), reaplica
+        if (GameData.savedPlayerPos) {
+            player.pos.x = GameData.savedPlayerPos.x;
+            player.pos.y = GameData.savedPlayerPos.y;
+        }
         me.game.world.addChild(player, 1);
 
-        GameData.player = player
-        if (GameData.savedPlayerPos) {
-            GameData.player.pos.x = GameData.savedPlayerPos.x;
-            GameData.player.pos.y = GameData.savedPlayerPos.y;
+        // HUD das armas — evita duplicar se já existir por algum motivo
+        let existingHud = me.game.world.getChildByType(WeaponHudContainer)[0];
+        if (!existingHud) {
+            this.weaponSlotsHud = new WeaponHudContainer(player);
+            me.game.world.addChild(this.weaponSlotsHud, 99);
+        } else {
+            existingHud.player = player;
+            this.weaponSlotsHud = existingHud;
         }
 
-        // HUD das armas: sempre visível sobre o jogo
-        this.weaponSlotsHud = new WeaponHudContainer(GameData.player)
-        me.game.world.addChild(this.weaponSlotsHud, 99);
-
+        // inimigos
         this.enemyManager = new EnemyManager();
         me.game.world.addChild(this.enemyManager, 2);
 
@@ -72,9 +97,11 @@ class PlayScreen extends me.Stage {
         this.xpHud = new XPHUD();
         me.game.world.addChild(this.xpHud, 9999);
 
+        // sistema de corações (HUD de vida)
         GameData.healthSystem = new HealthSystem();
         me.game.world.addChild(GameData.healthSystem, 9999);
 
+        // bindings
         me.input.bindKey(me.input.KEY.LEFT, "left");
         me.input.bindKey(me.input.KEY.A, "left");
         me.input.bindKey(me.input.KEY.RIGHT, "right");
@@ -118,8 +145,6 @@ class PlayScreen extends me.Stage {
         if (this.paused) {
             return true;
         }
-
-
 
         return true;
     }
