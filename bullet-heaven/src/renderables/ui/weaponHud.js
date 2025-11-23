@@ -34,16 +34,15 @@ class WeaponHud extends me.UISpriteElement {
         sprite.scale(3)
         this.parent.addChild(sprite, 100);
 
-        console.log(GameData.weaponLevels);
-
         const thisWeaponLevel = GameData.weaponLevels[this.weaponType]
-        this.xpText = new me.Text(x + 10, y + 6, {
-            font: "sans-serif",
+        this.xpText = new me.Text(x + 16, y + 1, {
+            font: "Micro 5",
             size: 25,
-            fillStyle: "#ffffff",
+            fillStyle: CONSTANTS.COLORS.WHITE,
+            strokeStyle: "#000000",
+            lineWidth: 0,
             textAlign: "left",
             textBaseline: "top",
-            strokeStyle: "#000"
         });
         this.xpText.setText(thisWeaponLevel)
         this.parent.addChild(this.xpText, 101);
