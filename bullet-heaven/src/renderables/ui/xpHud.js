@@ -43,11 +43,10 @@ class XPHUD extends me.Container {
     update(dt) {
         super.update(dt)
 
-        // só atualiza se o XP mudou
         if (GameData.xp !== this.lastXP) {
             this.lastXP = GameData.xp;
             this.xpText.setText(String(this.lastXP));
-            return true; // precisa redesenhar
+            return true;
         }
         return false;
     }

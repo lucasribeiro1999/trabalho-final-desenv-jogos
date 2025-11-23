@@ -16,7 +16,7 @@ export class RerollButton extends me.Container {
             fillStyle: GameData.xp >= CONSTANTS.XP.REROLL_COST ? CONSTANTS.COLORS.WHITE : "#555555",
             textAlign: "center",
             textBaseline: "middle",
-            text: `Reroll (${CONSTANTS.XP.REROLL_COST} XP)`
+            text: `Resetar (${CONSTANTS.XP.REROLL_COST} XP)`
         });
         this.addChild(this.textObj);
     }
@@ -26,7 +26,7 @@ export class RerollButton extends me.Container {
             const newColor = GameData.xp >= CONSTANTS.XP.REROLL_COST ? CONSTANTS.COLORS.WHITE : "#555555";
             this.textObj.fillStyle.parseCSS(newColor);
 
-            this.textObj.setText(`Reroll (${CONSTANTS.XP.REROLL_COST} XP)`);
+            this.textObj.setText(`Resetar (${CONSTANTS.XP.REROLL_COST} XP)`);
 
             return true;
         }

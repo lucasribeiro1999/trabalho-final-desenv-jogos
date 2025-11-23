@@ -41,7 +41,7 @@ class GameOverScreen extends me.Stage {
                 lineWidth: 0,
                 textAlign: "center",
                 textBaseline: "middle",
-                text: "Press ENTER to Restart"
+                text: "Aperte ENTER para Reiniciar"
             }
         );
         restartText.anchorPoint.set(0.5, 0.5);

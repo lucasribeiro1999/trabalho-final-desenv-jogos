@@ -18,7 +18,7 @@ export class UpgradeSelectionScreen extends me.Stage {
             me.game.viewport.width / 2,
             130,
             {
-                text: "Choose your upgrade!",
+                text: "Escolha seu upgrade!",
                 font: "Micro 5",
                 size: 72,
                 fillStyle: CONSTANTS.COLORS.YELLOW,
@@ -35,7 +35,7 @@ export class UpgradeSelectionScreen extends me.Stage {
             me.game.viewport.width / 2,
             210,
             {
-                text: "Select one to continue",
+                text: "Escolha um para continuar",
                 font: "Micro 5",
                 size: 48,
                 fillStyle: CONSTANTS.COLORS.WHITE,

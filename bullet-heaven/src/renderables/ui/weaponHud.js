@@ -58,7 +58,6 @@ class WeaponHud extends me.UISpriteElement {
             this.drawWeapon(this.pos.x, this.pos.y);
         }
 
-        // Update the weapon level text
         if (this.xpText) {
             this.xpText.setText(currentLevel);
         }

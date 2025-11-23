@@ -25,10 +25,9 @@ class WaveHUD extends me.Container {
     update(dt) {
         super.update(dt);
 
-        // Only update if wave changed
         if (GameData.currentWave !== this.lastWave) {
             this.lastWave = GameData.currentWave;
-            this.waveText.setText(`Wave ${GameData.currentWave + 1}`);
+            this.waveText.setText(`Horda: ${GameData.currentWave}`);
             return true;
         }
         return false;
