@@ -30,6 +30,10 @@ export class UpgradeSystem extends me.Container {
             const upgrade = GameData.activeUpgrades.get(id)
 
             upgrade.buyNewLevel()
+
+            if (id === CONSTANTS.UPGRADES.MORE_MAX_HEALTH) {
+                GameData.currentHealth = Math.min(GameData.currentHealth + 1, CONSTANTS.PLAYER.MAX_HEALTH + upgrade.level);
+            }
         }
 
         // Remove cards before changing state
