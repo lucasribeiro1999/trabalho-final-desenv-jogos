@@ -5,10 +5,11 @@ const defines = {
     SPRITE: { SCALE_UP: 2 },
     XP: { PER_ZOMBIE: 10 },
     COLORS: {
+        WHITE: "#ebecfa",
         BLUE: "#1f4bc5",
         PURPLE: "#6f20b9",
         ORANGE: "#df4620",
-        WHITE: "#ebecfa",
+        GREEN: "#2aee54",
         YELLOW: "#ffe02f",
         RED: "#f00c3e",
     },
