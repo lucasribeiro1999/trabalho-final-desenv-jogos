@@ -35,9 +35,11 @@ export default function onload() {
   }
 
   // Debug (pode tirar se quiser)
-  me.plugin.register(DebugPanelPlugin, "debugPanel");
+  me.plugin.register(DebugPanelPlugin, "debugPanel", {
+    key: me.input.KEY.V
+  });
 
-  // Áudio
+  // Áudio'
   me.audio.init("mp3,ogg");
 
   // Assets externos
