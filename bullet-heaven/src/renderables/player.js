@@ -221,15 +221,15 @@ class PlayerEntity extends me.Entity {
 
     takeDamage() {
         if (this.currentState === PlayerState.COLLIDING) {
+            this.currentHealth -= 1;
+
             if (this.currentHealth <= 0) {
                 this.currentHealth = 0;
                 this.startDeath();
-            } else {
-                this.currentHealth -= 1;
-
-                GameData.currentHealth = this.currentHealth;
-                GameData.healthSystem.updateHealth(this.currentHealth);
             }
+
+            GameData.currentHealth = this.currentHealth;
+            GameData.healthSystem.updateHealth(this.currentHealth);
         }
     }
 
