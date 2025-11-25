@@ -23,7 +23,7 @@ export class HealthSystem extends me.Container {
         this.hearts?.forEach(heart => this.removeChild(heart))
         this.hearts = []
 
-        const heartSpacing = 64;
+        const heartSpacing = 48;
         const heartWidth = 32;
         const padding = 16
 
