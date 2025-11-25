@@ -50,7 +50,7 @@ jobs:
         uses: actions/upload-pages-artifact@v4
         with:
           # Upload dist folder
-          path: './bullet-heaven/dist'
+          path: './dist'
       - name: Deploy to GitHub Pages
         working-directory: ./bullet-heaven
         id: deployment
