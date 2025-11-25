@@ -12,7 +12,7 @@ class WaveHUD extends me.Container {
 
         this.waveText = new me.Text(0, 0, {
             font: "Micro 5",
-            size: 38,
+            size: 48,
             fillStyle: CONSTANTS.COLORS.WHITE,
             textAlign: "center",
             textBaseline: "top",

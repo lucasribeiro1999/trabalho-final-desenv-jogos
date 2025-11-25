@@ -1,4 +1,10 @@
-# Zombie Apocalypse
+# Eternal Rot
+
+Eternal Rot é um jogo Bullet Heaven em que o jogador é um sobrevivente de um apocalypse zumbi e precisa sobreviver as infinitas e seu objetivo é sobreviver o máximo possível. Os zumbis tem a chance de dropar armas que a cada nível aumentar o alcance, dano e a velocidade de disparo e ao fim de cada horda é possível escolher um upgrade para fortalecer seu personagem.
+
+## Ferramenta Utilizada
+
+[MelonJS](https://melonjs.org/)
 
 ## Assets Usados
 
@@ -9,25 +15,32 @@
 <img src="./bullet-heaven/src/assets/upgrades/heal.png" alt="drawing" width="96"/> [Raven Fantasy Icons by ClockWork Raven](https://clockworkraven.itch.io/raven-fantasy-icons) & [Tiny RPG - Mana Soul GUI by tiopalada](https://tiopalada.itch.io/tiny-rpg-mana-soul-gui)
 
 
+## Como rodar
 
-## Etapas
+Faça o clone do projeto e abra a pasta dele no terminal.
 
-- [ ] Criar o mapa no Tiled
-- [x] Adicionar sprites e animações dos personagens/inimigos/tiros
-- [x] Fazer o personagem mover em todas as direções (falta cima, baixo e diagonais)
-- [x] Fazer os zumbis spawnarem aleatoriamente num circulo em volta do personagem
-- [x] Fazer os zumbis sempre andarem em direção ao personagem
-- [x] Adicionar colisão dos zumbis com o personagem
-- [x] Adicionar colisão dos tiros com os zumbis
-- [x] Fazer os zumbis droparem moedas ao morrerem
-- [x] Fazer o tiro padrão ser atirado na direção que o personagem anda
-- [x] Fazer slot de armas pro personagem trocar entre elas
-- [ ] Os zumbis tem chance de dropar uma arma com níveis de raridade
-- [ ] Armas iguais e de mesmo nível podem ser usadas pra craftar a mesma arma um nível acima
-- [ ] A cada horda abre uma loja com itens aleatórios que o personagem pode comprar para se equipar
+Em seguida, navegue até a pasta do jogo com 
 
-## Planos Futuros
+```sh
+cd bullet-heaven
+```
 
-- [ ] Adicionar munição nas armas e loot boxes no chão pro personagem reabastecer
-- [ ] Adicionar níveis de dificuldade que alteram parametros do jogo, como taxa de drop de munição
-- [ ] Spawnar "magias" em volta do personagem que dá dano na área do sprite da animação
+E instale as dependências com 
+
+```sh
+npm install
+```
+
+Após isso, rode o jogo com o comando
+
+```sh
+npm run dev
+```
+
+## Galeria
+
+![image](./tela-principal.png)
+
+![image](./tela-selecao-upgrade.png)
+
+![image](./tela-game-over.png)
