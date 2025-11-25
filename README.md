@@ -39,8 +39,8 @@ npm run dev
 
 ## Galeria
 
-![image](./tela-principal.png)
+![image](https://lucasribeiro1999.github.io/trabalho-final-desenv-jogos/tela-principal.png)
 
-![image](./tela-selecao-upgrade.png)
+![image](https://lucasribeiro1999.github.io/trabalho-final-desenv-jogos/tela-selecao-upgrade.png)
 
-![image](./tela-game-over.png)
+![image](https://lucasribeiro1999.github.io/trabalho-final-desenv-jogos/tela-game-over.png)
