@@ -151,6 +151,10 @@ class PlayScreen extends me.Stage {
             if (!this.paused) {
                 this.paused = true;
                 PlayScreen.isPaused = true;
+
+                // ⬇️ PAUSA A MÚSICA
+                me.audio.pause("gameplay-theme");
+
                 if (!this.pauseTextRenderable) {
                     this.pauseTextRenderable = new PausedText();
                     me.game.world.addChild(this.pauseTextRenderable, 99999);
@@ -158,6 +162,10 @@ class PlayScreen extends me.Stage {
             } else {
                 this.paused = false;
                 PlayScreen.isPaused = false;
+
+                // ⬇️ RESUME A MÚSICA
+                me.audio.resume("gameplay-theme");
+
                 if (this.pauseTextRenderable) {
                     me.game.world.removeChild(this.pauseTextRenderable);
                     this.pauseTextRenderable = null;

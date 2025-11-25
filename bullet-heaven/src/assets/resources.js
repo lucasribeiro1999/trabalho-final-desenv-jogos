@@ -50,10 +50,11 @@ export let GAME_RESOURCES = [
 
 
     /* Background music.
-     * @exampleata
+     * @example
      * { name: "example_bgm", type: "audio", src: "data/bgm/" },
      */
-    // { name: "dst-gameforest", type: "audio", src: "d/bgm/" },
+    // ⬇️ CAMINHO CORRETO: Aponta para a PASTA (sem o nome do arquivo)
+    { name: "gameplay-theme", type: "audio", src: "src/assets/audio/music/" },
 
     /* Sound effects.
      * @example
