@@ -8,11 +8,11 @@ Eternal Rot é um jogo Bullet Heaven em que o jogador é um sobrevivente de um a
 
 ## Assets Usados
 
-<img src="./bullet-heaven/src/assets/health/filled-heart.png" alt="drawing" width="64"/> [Pixel Heart and Mana UI by HochuPitsu](https://hochupitsu.itch.io/heart-and-mana)
+<img src="https://lucasribeiro1999.github.io/trabalho-final-desenv-jogos/bullet-heaven/src/assets/health/filled-heart.png" alt="drawing" width="64"/> [Pixel Heart and Mana UI by HochuPitsu](https://hochupitsu.itch.io/heart-and-mana)
 
-<img src="./bullet-heaven/src/assets/zombie-axe/idle-animation-preview.gif" alt="drawing" width="64"/> [Post Apocalypse Pixel Art Asset Pack by TheLazyStone](https://thelazystone.itch.io/post-apocalypse-pixel-art-asset-pack)
+<img src="https://lucasribeiro1999.github.io/trabalho-final-desenv-jogos/bullet-heaven/src/assets/zombie-axe/idle-animation-preview.gif" alt="drawing" width="64"/> [Post Apocalypse Pixel Art Asset Pack by TheLazyStone](https://thelazystone.itch.io/post-apocalypse-pixel-art-asset-pack)
 
-<img src="./bullet-heaven/src/assets/upgrades/heal.png" alt="drawing" width="96"/> [Raven Fantasy Icons by ClockWork Raven](https://clockworkraven.itch.io/raven-fantasy-icons) & [Tiny RPG - Mana Soul GUI by tiopalada](https://tiopalada.itch.io/tiny-rpg-mana-soul-gui)
+<img src="https://lucasribeiro1999.github.io/trabalho-final-desenv-jogos/bullet-heaven/src/assets/upgrades/heal.png" alt="drawing" width="96"/> [Raven Fantasy Icons by ClockWork Raven](https://clockworkraven.itch.io/raven-fantasy-icons) & [Tiny RPG - Mana Soul GUI by tiopalada](https://tiopalada.itch.io/tiny-rpg-mana-soul-gui)
 
 
 ## Como rodar
