@@ -47,6 +47,10 @@ export default function onload() {
 
   // Preload de recursos e setup dos estados
   me.loader.preload(GAME_RESOURCES, function () {
+    // ⬇️ TOCA MÚSICA DE FUNDO EM LOOP
+    // Parâmetros: (nome, loop, callback, volume)
+    me.audio.play("gameplay-theme", true, null, 0.4);
+
     me.state.set(me.state.PLAY, new PlayScreen());
     me.state.set(me.state.GAMEOVER, new GameOverScreen());
     me.state.set(me.state.UPGRADE_SELECTION, new UpgradeSelectionScreen());

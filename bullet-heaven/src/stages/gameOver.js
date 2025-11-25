@@ -5,6 +5,8 @@ import { GameData } from '../gameData.js';
 
 class GameOverScreen extends me.Stage {
     onResetEvent() {
+        me.audio.stop("gameplay-theme");
+
         // Limpa todos os objetos do mundo
         me.game.world.children.length = 0;
 
@@ -80,6 +82,7 @@ class GameOverScreen extends me.Stage {
     }
 
     onDestroyEvent() {
+        me.audio.play("gameplay-theme");
         me.input.unbindKey(me.input.KEY.ENTER);
     }
 }

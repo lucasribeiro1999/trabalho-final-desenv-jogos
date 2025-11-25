@@ -54,7 +54,7 @@ export let GAME_RESOURCES = [
      * { name: "example_bgm", type: "audio", src: "data/bgm/" },
      */
     // ⬇️ CAMINHO CORRETO: Aponta para a PASTA (sem o nome do arquivo)
-    { name: "gameplay-theme", type: "audio", src: "assets/audio/music/" },
+    { name: "gameplay-theme", type: "audio", src: "src/assets/audio/music/" },
 
     /* Sound effects.
      * @example
